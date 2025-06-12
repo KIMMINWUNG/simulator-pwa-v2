@@ -1,4 +1,4 @@
-// App.jsx with 다운로드 버튼 추가
+// App.jsx (다운로드 기능 제거)
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -21,8 +21,6 @@ export default function FullAutomationApp() {
   const [denominator, setDenominator] = useState(0);
   const [score, setScore] = useState(null);
   const [percentage, setPercentage] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
-  const [passedData, setPassedData] = useState([]);
 
   const handleRun = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
@@ -68,8 +66,6 @@ export default function FullAutomationApp() {
     setNumerator(passed.length);
     setScore(rawScore.toFixed(2));
     setPercentage(((rawScore / 20) * 100).toFixed(1));
-    setFilteredData(validGrades);
-    setPassedData(passed);
   };
 
   const readJson = file => new Promise((resolve, reject) => {
@@ -92,13 +88,6 @@ export default function FullAutomationApp() {
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
-
-  const downloadExcel = (data, filename) => {
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, filename);
-  };
 
   return (
     <div className="simulator">
@@ -125,18 +114,9 @@ export default function FullAutomationApp() {
       <button className="run-button" onClick={handleRun}>전체 자동화 실행</button>
       <div className="results">
         <p>총 DB 개수: <strong>{totalCount}</strong></p>
-        <p>
-          관리그룹 대상 개수: <strong>{targetCount}</strong>
-          {targetCount > 0 && (
-            <button onClick={() => downloadExcel(filteredData, "관리그룹대상DB.xlsx")} style={{ marginLeft: '10px' }}>관리그룹 대상 DB 다운로드</button>
-          )}
-        </p>
-        <p>
-          분자(목표등급 만족): <strong>{numerator}</strong>
-          {numerator > 0 && (
-            <button onClick={() => downloadExcel(passedData, "목표등급만족DB.xlsx")} style={{ marginLeft: '10px' }}>목표등급 만족 DB 다운로드</button>
-          )}
-        </p>
+        <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
+        <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
+        <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
         <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>
           최종 점수: {score}점 (20점 만점 기준, {percentage}%)
         </p>
