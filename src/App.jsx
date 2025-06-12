@@ -1,4 +1,4 @@
-// App.jsx with 보안 배너 포함
+// App.jsx with 점수 강조 + 퍼센트 병기 추가
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -20,6 +20,7 @@ export default function FullAutomationApp() {
   const [numerator, setNumerator] = useState(0);
   const [denominator, setDenominator] = useState(0);
   const [score, setScore] = useState(null);
+  const [percentage, setPercentage] = useState(null);
 
   const handleRun = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
@@ -57,11 +58,14 @@ export default function FullAutomationApp() {
     const validGrades = filtered.filter(r => !GRADE_EXCLUDE.includes(r.M?.trim()));
     const passed = validGrades.filter(r => gradeKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}`));
 
+    const rawScore = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
+
     setTotalCount(dbBody.length);
     setTargetCount(filtered.length);
     setDenominator(validGrades.length);
     setNumerator(passed.length);
-    setScore(validGrades.length > 0 ? ((passed.length / validGrades.length) * 100 * 0.2).toFixed(2) : "0.00");
+    setScore(rawScore.toFixed(2));
+    setPercentage(((rawScore / 20) * 100).toFixed(1));
   };
 
   const readJson = file => new Promise((resolve, reject) => {
@@ -113,7 +117,9 @@ export default function FullAutomationApp() {
         <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
         <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
         <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
-        <p>최종 점수: <strong>{score}</strong></p>
+        <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>
+          최종 점수: {score}점 (20점 만점 기준, {percentage}%)
+        </p>
       </div>
     </div>
   );
