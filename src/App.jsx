@@ -1,6 +1,7 @@
-// 기본 컴포넌트 기반 시뮬레이터 UI (shadcn 제거)
+// App.jsx with 보안 배너 포함
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
+import "./App.css";
 
 const LOCAL_GOV_LIST = [
   "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
@@ -85,25 +86,29 @@ export default function FullAutomationApp() {
   });
 
   return (
-    <div style={{ maxWidth: 800, margin: "auto", padding: 24 }}>
+    <div className="simulator">
+      <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
+        <strong>🔒 개인정보 및 보안 안내:</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다. 실적DB에 개인정보(예: 주민번호, 전화번호 등)가 포함되지 않도록 유의해주세요.
+      </div>
+
       <h2>최소유지관리기준 자동화 시뮬레이터</h2>
-      <div style={{ marginBottom: 12 }}>
-        <label>지자체 선택: </label>
+      <div className="form-group">
+        <label>지자체 선택:</label>
         <select onChange={e => setSelectedGov(e.target.value)} value={selectedGov}>
           <option value="">선택하세요</option>
           {LOCAL_GOV_LIST.map(g => <option key={g}>{g}</option>)}
         </select>
       </div>
-      <div style={{ marginBottom: 12 }}>
-        <label>고시문 업로드: </label>
+      <div className="form-group">
+        <label>고시문 업로드:</label>
         <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} />
       </div>
-      <div style={{ marginBottom: 12 }}>
-        <label>실적DB 업로드: </label>
+      <div className="form-group">
+        <label>실적DB 업로드:</label>
         <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} />
       </div>
-      <button onClick={handleRun}>전체 자동화 실행</button>
-      <div style={{ marginTop: 24 }}>
+      <button className="run-button" onClick={handleRun}>전체 자동화 실행</button>
+      <div className="results">
         <p>총 DB 개수: <strong>{totalCount}</strong></p>
         <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
         <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
