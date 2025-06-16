@@ -1,4 +1,4 @@
-// App.jsx (정부합동평가 시뮬레이터)
+// App.jsx (전체 코드 with input 튀어나감 여백 해결)
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -16,7 +16,6 @@ export default function FullAutomationApp() {
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
   const [planFile, setPlanFile] = useState(null);
-  const [planStatus, setPlanStatus] = useState([]);
   const [planScore, setPlanScore] = useState(null);
   const [planRate, setPlanRate] = useState(null);
   const [planTotal, setPlanTotal] = useState(0);
@@ -51,10 +50,7 @@ export default function FullAutomationApp() {
   });
 
   const handlePlanScore = async () => {
-    if (!planFile || !selectedGov) {
-      alert("지자체 및 실행계획 파일을 업로드해주세요.");
-      return;
-    }
+    if (!planFile || !selectedGov) return;
     const planWB = await readJson(planFile);
     const planData = planWB[Object.keys(planWB)[0]].slice(1);
     const filtered = planData.filter(r => r.B?.trim() === selectedGov);
@@ -63,13 +59,12 @@ export default function FullAutomationApp() {
       return date instanceof Date && !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
     });
     const missed = filtered.filter(r => !done.includes(r));
-    setPlanStatus(filtered);
     setPlanTotal(filtered.length);
     setPlanDone(done.length);
     setPlanMissing(missed);
-    const rawScore = filtered.length > 0 ? (done.length / filtered.length) * 100 * 0.1 : 0;
-    setPlanScore(rawScore.toFixed(2));
-    setPlanRate(((rawScore / 10) * 100).toFixed(1));
+    const raw = filtered.length > 0 ? (done.length / filtered.length) * 100 * 0.1 : 0;
+    setPlanScore(raw.toFixed(2));
+    setPlanRate(((raw / 10) * 100).toFixed(1));
   };
 
   const handlePlanDownload = () => {
@@ -87,10 +82,7 @@ export default function FullAutomationApp() {
   };
 
   const handleMaintainScore = async () => {
-    if (!selectedGov || !noticeFile || !dbFile) {
-      alert("지자체, 고시문, 실적DB를 모두 선택해주세요.");
-      return;
-    }
+    if (!selectedGov || !noticeFile || !dbFile) return;
     const noticeWB = await readRaw(noticeFile);
     const sheet = noticeWB.Sheets[selectedGov];
     const db = await readJson(dbFile);
@@ -117,13 +109,13 @@ export default function FullAutomationApp() {
     const filtered = dbBody.filter(r => groupKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.C?.trim()}`));
     const validGrades = filtered.filter(r => !GRADE_EXCLUDE.includes(r.M?.trim()));
     const passed = validGrades.filter(r => gradeKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}`));
-    const rawScore = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
+    const raw = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
     setTotalCount(dbBody.length);
     setTargetCount(filtered.length);
     setDenominator(validGrades.length);
     setNumerator(passed.length);
-    setScore(rawScore.toFixed(2));
-    setPercentage(((rawScore / 20) * 100).toFixed(1));
+    setScore(raw.toFixed(2));
+    setPercentage(((raw / 20) * 100).toFixed(1));
   };
 
   return (
@@ -140,22 +132,17 @@ export default function FullAutomationApp() {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
-        <div style={{ flex: 1, minWidth: '340px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ flex: 1, minWidth: '360px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
           <div className="form-group">
             <label>실행계획 확정현황 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ width: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '100%' }} />
           </div>
           <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
           <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
           {planMissing.length > 0 && (
-            <button
-              style={{ backgroundColor: '#cce4f6', color: '#000', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px', marginTop: '8px' }}
-              onClick={handlePlanDownload}
-            >
-              미제출 기관 리스트 다운로드
-            </button>
+            <button style={{ backgroundColor: '#cce4f6', color: '#000', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px' }} onClick={handlePlanDownload}>미제출 기관 리스트 다운로드</button>
           )}
           <div style={{ marginTop: '40px' }}>
             <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
@@ -163,15 +150,15 @@ export default function FullAutomationApp() {
           </div>
         </div>
 
-        <div style={{ flex: 1, minWidth: '340px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ flex: 1, minWidth: '360px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>② 최소유지관리기준 만족여부</h3>
           <div className="form-group">
             <label>고시문 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ width: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%' }} />
           </div>
           <div className="form-group">
             <label>실적DB 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ width: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%' }} />
           </div>
           <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
           <p>총 DB 개수: <strong>{totalCount}</strong></p>
