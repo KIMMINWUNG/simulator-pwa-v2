@@ -1,4 +1,4 @@
-// App.jsx (전체 코드 with input 튀어나감 여백 해결)
+// App.jsx 전체코드
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -131,12 +131,12 @@ export default function FullAutomationApp() {
         </select>
       </div>
 
-      <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
-        <div style={{ flex: 1, minWidth: '360px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+      <div style={{ display: 'flex', gap: '24px', marginTop: '20px' }}>
+        <div style={{ flex: 1.5, minWidth: '380px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
           <div className="form-group">
             <label>실행계획 확정현황 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           </div>
           <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
@@ -150,15 +150,15 @@ export default function FullAutomationApp() {
           </div>
         </div>
 
-        <div style={{ flex: 1, minWidth: '360px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ flex: 1.5, minWidth: '380px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>② 최소유지관리기준 만족여부</h3>
           <div className="form-group">
             <label>고시문 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           </div>
           <div className="form-group">
             <label>실적DB 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%' }} />
+            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           </div>
           <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
           <p>총 DB 개수: <strong>{totalCount}</strong></p>
