@@ -144,33 +144,37 @@ export default function FullAutomationApp() {
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
           <div className="form-group">
             <label>실행계획 확정현황 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} />
+            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ width: '100%' }} />
           </div>
           <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
           <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
           {planMissing.length > 0 && <button style={{ backgroundColor: '#cce4f6', color: '#000', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px', marginTop: '8px' }} onClick={handlePlanDownload}>미제출 기관 리스트 다운로드</button>}
-          <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px', marginTop: '10px' }}>최종 점수: {planScore}점 (10점 만점 기준, {planRate}%)</p>
+          <div style={{ marginTop: '20px' }}>
+            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
+            <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
+          </div>
         </div>
 
         <div style={{ flex: 1, border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>② 최소유지관리기준 만족여부</h3>
           <div className="form-group">
             <label>고시문 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} />
+            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ width: '100%' }} />
           </div>
           <div className="form-group">
             <label>실적DB 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} />
+            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ width: '100%' }} />
           </div>
           <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
           <p>총 DB 개수: <strong>{totalCount}</strong></p>
           <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
           <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
           <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
-          <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px', marginTop: '10px' }}>
-            최종 점수: {score}점 (20점 만점 기준, {percentage}%)
-          </p>
+          <div style={{ marginTop: '20px' }}>
+            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
+            <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
+          </div>
         </div>
       </div>
     </div>
