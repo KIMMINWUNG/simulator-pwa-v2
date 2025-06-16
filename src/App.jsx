@@ -1,4 +1,4 @@
-// App.jsx (정부합동평가 시뮬레이터 2단 구성)
+// App.jsx (정부합동평가 시뮬레이터)
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -127,7 +127,7 @@ export default function FullAutomationApp() {
   };
 
   return (
-    <div className="simulator">
+    <div className="simulator" style={{ padding: '24px' }}>
       <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
       <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표<br />자동화 시뮬레이터</h2>
 
@@ -140,7 +140,7 @@ export default function FullAutomationApp() {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
-        <div style={{ flex: 1, border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ flex: 1, minWidth: '340px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
           <div className="form-group">
             <label>실행계획 확정현황 업로드:</label>
@@ -149,14 +149,21 @@ export default function FullAutomationApp() {
           <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
           <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
-          {planMissing.length > 0 && <button style={{ backgroundColor: '#cce4f6', color: '#000', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px', marginTop: '8px' }} onClick={handlePlanDownload}>미제출 기관 리스트 다운로드</button>}
-          <div style={{ marginTop: '20px' }}>
+          {planMissing.length > 0 && (
+            <button
+              style={{ backgroundColor: '#cce4f6', color: '#000', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px', marginTop: '8px' }}
+              onClick={handlePlanDownload}
+            >
+              미제출 기관 리스트 다운로드
+            </button>
+          )}
+          <div style={{ marginTop: '40px' }}>
             <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
             <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
           </div>
         </div>
 
-        <div style={{ flex: 1, border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ flex: 1, minWidth: '340px', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>② 최소유지관리기준 만족여부</h3>
           <div className="form-group">
             <label>고시문 업로드:</label>
@@ -171,7 +178,7 @@ export default function FullAutomationApp() {
           <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
           <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
           <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '40px' }}>
             <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
             <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
           </div>
