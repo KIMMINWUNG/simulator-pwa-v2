@@ -15,6 +15,7 @@ export default function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
+  const [planFile, setPlanFile] = useState(null);
   const [planStatus, setPlanStatus] = useState([]);
   const [planScore, setPlanScore] = useState(null);
   const [planRate, setPlanRate] = useState(null);
@@ -50,7 +51,11 @@ export default function FullAutomationApp() {
   });
 
   const handlePlanScore = async () => {
-    const planWB = await readJson(await fetch("/실행계획 확정현황.xlsx").then(r => r.blob()));
+    if (!planFile || !selectedGov) {
+      alert("지자체 및 실행계획 파일을 업로드해주세요.");
+      return;
+    }
+    const planWB = await readJson(planFile);
     const planData = planWB[Object.keys(planWB)[0]].slice(1);
     const filtered = planData.filter(r => r.B?.trim() === selectedGov);
     const done = filtered.filter(r => {
@@ -137,7 +142,11 @@ export default function FullAutomationApp() {
       <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
         <div style={{ flex: 1, border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
-          <button onClick={handlePlanScore}>점수 산출</button>
+          <div className="form-group">
+            <label>실행계획 확정현황 업로드:</label>
+            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} />
+          </div>
+          <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
           <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
           {planMissing.length > 0 && <button onClick={handlePlanDownload}>미제출 기관 리스트 다운로드</button>}
