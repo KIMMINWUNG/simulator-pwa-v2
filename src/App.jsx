@@ -141,7 +141,7 @@ export default function FullAutomationApp() {
   };
 
   return (
-    <div className="simulator" style={{ padding: '24px', maxWidth: '1300px', margin: '0 auto', background: '#f9fafb', borderRadius: '12px' }}>
+    <div className="simulator" style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
         <strong>🔒 개인정보 및 보안 안내:</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
       </div>
@@ -162,13 +162,14 @@ export default function FullAutomationApp() {
         <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
           <h3>① 기반시설 관리 실행계획 제출여부</h3>
           <label>실행계획 확정현황 업로드:</label>
-          <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', marginBottom: '10px' }} />
+          <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
           <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
           <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
           {planMissing.length > 0 && <button onClick={handlePlanDownload} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px' }}>미제출 기관 리스트 다운로드</button>}
-          <div style={{ marginTop: '30px' }}>
-            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore} <span style={{ fontSize: '16px', color: 'red' }}>({planRate}%)</span></p>
+          <div style={{ marginTop: '40px' }}>
+            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore ?? '점'}</p>
+            <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate ?? '%'})</p>
           </div>
         </div>
 
@@ -176,9 +177,9 @@ export default function FullAutomationApp() {
         <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
           <h3>② 최소유지관리기준 만족여부</h3>
           <label>고시문 업로드:</label>
-          <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', marginBottom: '10px' }} />
+          <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           <label>실적DB 업로드:</label>
-          <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', marginBottom: '10px' }} />
+          <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
           <p>총 DB 개수: <strong>{totalCount}</strong></p>
           <p>
@@ -192,8 +193,9 @@ export default function FullAutomationApp() {
             {gradePassed.length > 0 && <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ marginLeft: '6px', backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 만족 DB</button>}
             {gradeFailed.length > 0 && <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ marginLeft: '6px', backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 불만족 DB</button>}
           </p>
-          <div style={{ marginTop: '30px' }}>
-            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score} <span style={{ fontSize: '16px', color: 'red' }}>({percentage}%)</span></p>
+          <div style={{ marginTop: '40px' }}>
+            <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score ?? '점'}</p>
+            <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage ?? '%'})</p>
           </div>
         </div>
       </div>
