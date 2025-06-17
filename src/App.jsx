@@ -109,7 +109,7 @@ export default function FullAutomationApp() {
     const noticeWB = await readRaw(noticeFile);
     const sheet = noticeWB.Sheets[selectedGov];
     const db = await readJson(dbFile);
-    let dbBody = db[Object.keys(db)[0]].slice(1);
+    let dbBody = db[Object.keys(db)[0]].slice(1).filter(r => r.H?.trim() === selectedGov);
     if (excludePrivate) {
       dbBody = dbBody.filter(r => !privateList.includes(r.I?.trim()));
     }
