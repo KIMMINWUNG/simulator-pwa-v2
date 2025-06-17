@@ -148,7 +148,9 @@ export default function FullAutomationApp() {
     </div>
 
     {/* 제목 */}
-    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
+    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
+  정부합동평가
     <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표<br />자동화 시뮬레이터</h2>
 
     {/* 지자체 선택 */}
@@ -199,7 +201,7 @@ export default function FullAutomationApp() {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
            {gradePassed.length > 0 && <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 만족 DB</button>}
            {gradeFailed.length > 0 && <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 불만족 DB</button>}
-        </div>
+    </div>
 
         <div style={{ marginTop: '30px' }}>
             <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
