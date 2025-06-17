@@ -148,8 +148,10 @@ export default function FullAutomationApp() {
     </div>
 
     {/* 제목 */}
-    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-      <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />정부합동평가</h1>
+    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold', position: 'relative' }}>
+  정부합동평가
+  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px', position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '10px' }} />
+</h1>
     <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표<br />자동화 시뮬레이터</h2>
 
     {/* 지자체 선택 */}
