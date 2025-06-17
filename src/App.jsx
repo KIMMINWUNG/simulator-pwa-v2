@@ -177,9 +177,9 @@ export default function FullAutomationApp() {
         <div style={{ margin: '12px 0' }}>
           <label style={{ marginRight: '12px' }}>민간관리자 또는 민자사업자 관리주체의 DB를 제외하시겠습니까?</label>
           <select value={excludePrivate ? "네" : "아니오"} onChange={e => setExcludePrivate(e.target.value === "네")}> 
-             <option>네</option>
-             <option>아니오</option>
-          </select>
+  <option>네</option>
+  <option>아니오</option>
+</select>
         </div>
 
         <div style={{ display: 'flex', gap: '24px', marginTop: '20px' }}>
