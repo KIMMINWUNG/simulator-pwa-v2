@@ -210,6 +210,9 @@ export default function FullAutomationApp() {
     <label>실적DB 업로드:</label>
     <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
     <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
+<p style={{ fontSize: '13px', color: '#666', marginTop: '8px' }}>
+  DB가 많은 경우 점수 산출에 시간이 걸릴 수 있습니다.
+</p>
 
     <p>총 DB 개수: <strong>{totalCount}</strong></p>
     <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
