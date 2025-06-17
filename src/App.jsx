@@ -194,10 +194,11 @@ export default function FullAutomationApp() {
         </div>
 
         <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
+        <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
+
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
-          {gradePassed.length > 0 && <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 만족 DB</button>}
-          {gradeFailed.length > 0 && <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 불만족 DB</button>}
+           {gradePassed.length > 0 && <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 만족 DB</button>}
+           {gradeFailed.length > 0 && <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>목표등급 불만족 DB</button>}
         </div>
 
         <div style={{ marginTop: '30px' }}>
