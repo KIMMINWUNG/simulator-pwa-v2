@@ -141,17 +141,19 @@ export default function FullAutomationApp() {
   };
 
   return (
-  <div className="simulator" style={{ padding: '24px', maxWidth: '1300px', margin: '0 auto', background: '#f9fafb', borderRadius: '12px' }}>
-    {/* 개인정보 배너 */}
-    <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
-      <strong>🔒 개인정보 및 보안 안내:</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
-    </div>
+  <div style={{ position: 'relative' }}>
+  {/* 좌측 상단 CI 로고 */}
+  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: 0, left: 0, height: '36px', margin: '8px' }} />
+
+  {/* 보안 문구 */}
+  <div style={{ marginLeft: '52px', backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', borderRadius: '6px', fontSize: '14px' }}>
+    <strong>🔒 개인정보 및 보안 안내:</strong>
+    이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며,
+    업로드된 파일은 서버에 저장되지 않습니다.
+  </div>
 
     {/* 제목 */}
-    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold', position: 'relative' }}>
-  정부합동평가
-  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px', position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '10px' }} />
-</h1>
+    <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
     <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표<br />자동화 시뮬레이터</h2>
 
     {/* 지자체 선택 */}
