@@ -193,7 +193,7 @@ export default function FullAutomationApp() {
           <label>고시문 업로드:</label>
           <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
           <label>실적DB 업로드:</label>
-          <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
+          <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' , marginBottom: '12px'}} />
           <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
 
           <p>총 DB 개수: <strong>{totalCount}</strong></p>
