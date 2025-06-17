@@ -176,14 +176,14 @@ export default function FullAutomationApp() {
           </div>
         </div>
 
-        {/* ② 유지관리기준 카드 */}
+        {/* ② 유지관리기준 */}
       <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
         <h3>② 최소유지관리기준 만족여부</h3>
         <label>고시문 업로드:</label>
-        <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} />
-        <label>실적DB 업로드:</label>
-        <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} />
-        <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
+          <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
+          <label>실적DB 업로드:</label>
+          <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
+          <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
 
         <p>총 DB 개수: <strong>{totalCount}</strong></p>
 
