@@ -141,8 +141,8 @@ export default function FullAutomationApp() {
   };
 
   return (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f0f2f5' }}>
-    <div className="simulator" style={{ padding: '24px', maxWidth: '1300px', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
+  <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+    <div className="simulator" style={{ padding: '24px', width: '1300px', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
       <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
       <div style={{ marginTop: '8px', backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', borderRadius: '6px', fontSize: '14px' }}>
