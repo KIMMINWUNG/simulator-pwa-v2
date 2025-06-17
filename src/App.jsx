@@ -157,11 +157,11 @@ export default function FullAutomationApp() {
         overflow: 'hidden',
         textOverflow: 'ellipsis'
       }}>
-        <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
+        <strong>🔒 정보 보안 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
       </div>
 
       <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
-      <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표<br />자동화 시뮬레이터</h2>
+      <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표(기반시설관리법) <br />자동화 시뮬레이터</h2>
 
       <div className="form-group">
         <label>지자체 선택:</label>
