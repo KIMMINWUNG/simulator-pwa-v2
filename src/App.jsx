@@ -142,12 +142,11 @@ export default function FullAutomationApp() {
 
   return (
   <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-    <div className="simulator" style={{ padding: '24px', width: '1300px', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
+    <div className="simulator" style={{ padding: '24px', width: '1500px', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
       <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
       <div style={{ marginTop: '8px', backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', borderRadius: '6px', fontSize: '14px' }}>
-        <strong>🔒 개인정보 및 보안 안내:</strong>
-        이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
+        <strong>🔒 개인정보 및 보안 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
       </div>
 
       <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
