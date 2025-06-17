@@ -157,7 +157,7 @@ export default function FullAutomationApp() {
         overflow: 'hidden',
         textOverflow: 'ellipsis'
       }}>
-        <strong>🔒 개인정보 및 보안 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
+        <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
       </div>
 
       <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
