@@ -197,7 +197,7 @@ export default function FullAutomationApp() {
       </button>
     )}
     <div style={{ marginTop: '40px' }}>
-      <p style={{ color:'#e57373', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
+      <p style={{ color:'#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
     </div>
   </div>
@@ -246,7 +246,7 @@ export default function FullAutomationApp() {
     </div>
 
     <div style={{ marginTop: '30px' }}>
-      <p style={{ color: '#e57373C', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
+      <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
             </div>
           </div>
