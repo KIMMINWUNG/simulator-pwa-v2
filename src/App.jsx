@@ -197,7 +197,7 @@ export default function FullAutomationApp() {
       </button>
     )}
     <div style={{ marginTop: '40px' }}>
-      <p style={{ color:'# DC143C', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
+      <p style={{ color:'#e57373', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
     </div>
   </div>
@@ -210,7 +210,7 @@ export default function FullAutomationApp() {
     <label>실적DB 업로드:</label>
     <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
     <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
-<p style={{ fontSize: '13px', color: '# DC143C', marginTop: '8px' }}>
+<p style={{ fontSize: '13px', color: '#e57373', marginTop: '8px' }}>
   ❗DB가 많은 경우 점수 산출에 시간이 걸릴 수 있습니다.
 </p>
 
@@ -246,7 +246,7 @@ export default function FullAutomationApp() {
     </div>
 
     <div style={{ marginTop: '30px' }}>
-      <p style={{ color: '# DC143C', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
+      <p style={{ color: '#e57373C', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
             </div>
           </div>
