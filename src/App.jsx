@@ -176,56 +176,75 @@ export default function FullAutomationApp() {
 
         <div style={{ margin: '12px 0' }}>
           <label style={{ marginRight: '12px' }}>민간관리자 또는 민자사업자 관리주체의 DB를 제외하시겠습니까?</label>
-          <select value={excludePrivate ? "네" : "아니오"} onChange={e => setExcludePrivate(e.target.value === "네")}>
+          <select value={excludePrivate ? "네" : "아니오"} onChange={e => setExcludePrivate(e.target.value === "네")}> 
             <option>아니오</option>
             <option>네</option>
           </select>
         </div>
 
         <div style={{ display: 'flex', gap: '24px', marginTop: '20px' }}>
-          {/* ② 최소유지관리기준 */}
-          <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
-            <h3>② 최소유지관리기준 만족여부</h3>
-            <label>고시문 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
-            <label>실적DB 업로드:</label>
-            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
-            <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
+  {/* ① 실행계획 제출여부 */}
+  <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
+    <h3>① 기반시설 관리 실행계획 제출여부</h3>
+    <label>실행계획 확정현황 업로드:</label>
+    <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
+    <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
+    <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
+    <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
+    {planMissing.length > 0 && (
+      <button onClick={handlePlanDownload} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px' }}>
+        미제출 기관 리스트 다운로드
+      </button>
+    )}
+    <div style={{ marginTop: '40px' }}>
+      <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
+      <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
+    </div>
+  </div>
 
-            <p>총 DB 개수: <strong>{totalCount}</strong></p>
-            <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              {groupIncluded.length > 0 && (
-                <button onClick={() => downloadExcel(groupIncluded, "관리그룹_포함DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                  관리그룹 포함 DB
-                </button>
-              )}
-              {groupExcluded.length > 0 && (
-                <button onClick={() => downloadExcel(groupExcluded, "관리그룹_제외DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                  관리그룹 제외 DB
-                </button>
-              )}
-            </div>
+  {/* ② 최소유지관리기준 만족여부 */}
+  <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
+    <h3>② 최소유지관리기준 만족여부</h3>
+    <label>고시문 업로드:</label>
+    <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
+    <label>실적DB 업로드:</label>
+    <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
+    <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
 
-            <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
-            <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
+    <p>총 DB 개수: <strong>{totalCount}</strong></p>
+    <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
+    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+      {groupIncluded.length > 0 && (
+        <button onClick={() => downloadExcel(groupIncluded, "관리그룹_포함DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+          관리그룹 포함 DB
+        </button>
+      )}
+      {groupExcluded.length > 0 && (
+        <button onClick={() => downloadExcel(groupExcluded, "관리그룹_제외DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+          관리그룹 제외 DB
+        </button>
+      )}
+    </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              {gradePassed.length > 0 && (
-                <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                  목표등급 만족 DB
-                </button>
-              )}
-              {gradeFailed.length > 0 && (
-                <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                  목표등급 불만족 DB
-                </button>
-              )}
-            </div>
+    <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
+    <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
 
-            <div style={{ marginTop: '30px' }}>
-              <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
-              <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
+    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+      {gradePassed.length > 0 && (
+        <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+          목표등급 만족 DB
+        </button>
+      )}
+      {gradeFailed.length > 0 && (
+        <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+          목표등급 불만족 DB
+        </button>
+      )}
+    </div>
+
+    <div style={{ marginTop: '30px' }}>
+      <p style={{ color: 'red', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
+      <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
             </div>
           </div>
         </div>
