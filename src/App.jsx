@@ -16,7 +16,7 @@ const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당
 
 export default function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
-  const [excludePrivate, setExcludePrivate] = useState(false);
+  const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
