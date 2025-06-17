@@ -210,5 +210,5 @@ export default function FullAutomationApp() {
       </div>
     </div>
   </div>
- );
+);
  }
