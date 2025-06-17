@@ -141,12 +141,12 @@ export default function FullAutomationApp() {
   };
 
   return (
-  <div style={{ position: 'relative' }}>
+  <div className="simulator" style={{ padding: '24px', maxWidth: '1300px', margin: '0 auto', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
   {/* 좌측 상단 CI 로고 */}
-  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: 0, left: 0, height: '36px', margin: '8px' }} />
+  <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
   {/* 보안 문구 */}
-  <div style={{ marginLeft: '52px', backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', borderRadius: '6px', fontSize: '14px' }}>
+  <div style={{ marginTop: '8px', backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', borderRadius: '6px', fontSize: '14px' }}>
     <strong>🔒 개인정보 및 보안 안내:</strong>
     이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며,
     업로드된 파일은 서버에 저장되지 않습니다.
