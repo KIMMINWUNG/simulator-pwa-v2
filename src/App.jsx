@@ -62,12 +62,16 @@ export default function FullAutomationApp() {
     reader.readAsArrayBuffer(file);
   });
 
+  // ✅ 중복 문제 해결된 버전
   const downloadExcel = (data, filename) => {
-    const processed = data.map((r) => ({
-      "관리번호": r.A || "",
-      "기반시설물명": r.B || "",
-      ...r,
-    }));
+    const processed = data.map((r) => {
+      const { A, B, ...rest } = r;
+      return {
+        "관리번호": A || "",
+        "기반시설물명": B || "",
+        ...rest,
+      };
+    });
     const ws = XLSX.utils.json_to_sheet(processed);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
@@ -163,8 +167,8 @@ export default function FullAutomationApp() {
           <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
         </div>
 
-        <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>정부합동평가</h1>
-        <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표(기반시설관리법) <br />자동화 시뮬레이터</h2>
+        <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>지자체 합동평가</h1>
+        <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표(기반시설관리법) <br />점수 자동화 프로그램</h2>
 
         <div className="form-group">
           <label>지자체 선택:</label>
