@@ -156,7 +156,7 @@ export default function FullAutomationApp() {
 
   return (
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-      <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#f9fafb', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
+      <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
         <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
