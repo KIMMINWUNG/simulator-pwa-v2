@@ -1,3 +1,5 @@
+// App.jsx (정부합동평가 시뮬레이터 최종 완성본 전체 코드)
+
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -29,12 +31,7 @@ export default function ProtectedApp() {
           style={{ padding: "8px", width: "200px", marginBottom: "12px" }}
         />
         <br />
-        <button
-          onClick={() => setAuthorized(inputKey === MASTER_KEY)}
-          style={{ padding: "8px 16px" }}
-        >
-          입장하기
-        </button>
+        <button onClick={() => setAuthorized(inputKey === MASTER_KEY)} style={{ padding: "8px 16px" }}>입장하기</button>
       </div>
     );
   }
@@ -104,98 +101,7 @@ function FullAutomationApp() {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
-
-  // ✅ 이후 점수 계산 로직 (handlePlanScore, handleMaintainScore 등) 기존 동일하게 유지
-  return (
-    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-      <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
-        <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
-        {/* ✅ 이 아래 시뮬레이터 내용은 그대로 둔 상태로 계속 이어지면 됩니다. */}
-      </div>
-    </div>
-  );
-}
-
-  const handlePlanScore = async () => {
-    if (!planFile || !selectedGov) return;
-    const planWB = await readJson(planFile);
-    const sheet = planWB[Object.keys(planWB)[0]];
-    const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
-    const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r.C?.trim())) : filtered;
-    const done = finalData.filter(r => {
-      const date = new Date(r.H);
-      return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
-    });
-    const missed = finalData.filter(r => !done.includes(r));
-    setPlanTotal(finalData.length);
-    setPlanDone(done.length);
-    setPlanMissing(missed);
-    const raw = finalData.length > 0 ? (done.length / finalData.length) * 100 * 0.1 : 0;
-    setPlanScore(raw.toFixed(2));
-    setPlanRate(((raw / 10) * 100).toFixed(1));
-  };
-
-  const handlePlanDownload = () => {
-    const data = planMissing.map((r, i) => ({
-      "순번": i + 1,
-      "관리계획 수립기관": r.B || "",
-      "작성기관": r.C || "",
-      "시설종류": r.D || "",
-      "담당자": r.F || "",
-    }));
-    downloadExcel(data, "미제출_기관_리스트.xlsx");
-  };
-
-  const handleMaintainScore = async () => {
-    if (!selectedGov || !noticeFile || !dbFile) return;
-    const noticeWB = await readRaw(noticeFile);
-    const sheet = noticeWB.Sheets[selectedGov];
-    const db = await readJson(dbFile);
-    let dbBody = db[Object.keys(db)[0]].slice(1).filter(r => r.H?.trim() === selectedGov);
-    if (excludePrivate) {
-      dbBody = dbBody.filter(r => !privateList.includes(r.I?.trim()));
-    }
-
-    const groupCols = ["C","D","E","F","G"];
-    const gradeCols = ["H","I","J","K","L","M","N","O","P","Q"];
-    const groupKeys = new Set();
-    const gradeKeys = new Set();
-
-    for (let i = 2; i < 200; i++) {
-      const infra = sheet[`A${i}`]?.v?.trim();
-      const fac = sheet[`B${i}`]?.v?.trim();
-      if (!infra || !fac) continue;
-      for (let col of groupCols) {
-        const v = sheet[`${col}${i}`]?.v?.trim();
-        const label = sheet[`${col}1`]?.v?.trim();
-        if (v === "O") groupKeys.add(`${infra}||${fac}||${label}`);
-      }
-      for (let col of gradeCols) {
-        const v = sheet[`${col}${i}`]?.v?.trim();
-        const label = sheet[`${col}1`]?.v?.trim();
-        if (v === "O") gradeKeys.add(`${infra}||${fac}||${label}`);
-      }
-    }
-
-    const included = dbBody.filter(r => groupKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.C?.trim()}`));
-    const excluded = dbBody.filter(r => !groupKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.C?.trim()}`));
-    const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r.M?.trim()));
-    const passed = validGrades.filter(r => gradeKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}`));
-    const failed = validGrades.filter(r => !gradeKeys.has(`${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}`));
-    const raw = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
-
-    setGroupIncluded(included);
-    setGroupExcluded(excluded);
-    setGradePassed(passed);
-    setGradeFailed(failed);
-    setTotalCount(dbBody.length);
-    setTargetCount(included.length);
-    setDenominator(validGrades.length);
-    setNumerator(passed.length);
-    setScore(raw.toFixed(2));
-    setPercentage(((raw / 20) * 100).toFixed(1));
-  };
-
+  
   return (
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
