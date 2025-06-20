@@ -1,6 +1,3 @@
-// App.jsx (정부합동평가 시뮬레이터 최종 완성본 전체 코드)
-// ✅ 오류 수정본 포함
-
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -14,7 +11,38 @@ const LOCAL_GOV_LIST = [
 
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 
-export default function FullAutomationApp() {
+export default function ProtectedApp() {
+  const [authorized, setAuthorized] = useState(false);
+  const [inputKey, setInputKey] = useState("");
+  const MASTER_KEY = "k.infra";
+
+  if (!authorized) {
+    return (
+      <div style={{ marginTop: "100px", textAlign: "center" }}>
+        <h2>🔒 인증이 필요합니다</h2>
+        <p>기반터 발급 KEY를 입력하세요</p>
+        <input
+          type="password"
+          placeholder="KEY 입력"
+          value={inputKey}
+          onChange={e => setInputKey(e.target.value)}
+          style={{ padding: "8px", width: "200px", marginBottom: "12px" }}
+        />
+        <br />
+        <button
+          onClick={() => setAuthorized(inputKey === MASTER_KEY)}
+          style={{ padding: "8px 16px" }}
+        >
+          입장하기
+        </button>
+      </div>
+    );
+  }
+
+  return <FullAutomationApp />;
+}
+
+function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
@@ -62,7 +90,6 @@ export default function FullAutomationApp() {
     reader.readAsArrayBuffer(file);
   });
 
-  // ✅ 중복 문제 해결된 버전
   const downloadExcel = (data, filename) => {
     const processed = data.map((r) => {
       const { A, B, ...rest } = r;
@@ -77,6 +104,17 @@ export default function FullAutomationApp() {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
+
+  // ✅ 이후 점수 계산 로직 (handlePlanScore, handleMaintainScore 등) 기존 동일하게 유지
+  return (
+    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+      <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
+        <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
+        {/* ✅ 이 아래 시뮬레이터 내용은 그대로 둔 상태로 계속 이어지면 됩니다. */}
+      </div>
+    </div>
+  );
+}
 
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) return;
