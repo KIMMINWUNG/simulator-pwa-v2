@@ -9,41 +9,31 @@ const LOCAL_GOV_LIST = [
   "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
 ];
-
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
+const MASTER_KEY = "k.infra";
 
-export default function App() {
-  return authorized ? <FullAutomationApp /> : <LoginComponent />;
-}
-  const [authorized, setAuthorized] = useState(false);
+function LoginComponent({ onSuccess }) {
   const [inputKey, setInputKey] = useState("");
-  const MASTER_KEY = "k.infra";
-
   return (
-    <div>
-      {authorized ? (
-        <FullAutomationApp />
-      ) : (
-        <div style={{ marginTop: "100px", textAlign: "center" }}>
-          <h2>🔒 인증이 필요합니다</h2>
-          <p>기반터 발급 KEY를 입력하세요</p>
-          <input
-            type="password"
-            placeholder="KEY 입력"
-            value={inputKey}
-            onChange={e => setInputKey(e.target.value)}
-            style={{ padding: "8px", width: "200px", marginBottom: "12px" }}
-          />
-          <br />
-          <button onClick={() => {
-            if (inputKey === MASTER_KEY) setAuthorized(true);
-          }} style={{ padding: "8px 16px" }}>
-            입장하기
-          </button>
-        </div>
-      )}
+    <div style={{ marginTop: "100px", textAlign: "center" }}>
+      <h2>🔒 인증이 필요합니다</h2>
+      <p>기반터 발급 KEY를 입력하세요</p>
+      <input
+        type="password"
+        placeholder="KEY 입력"
+        value={inputKey}
+        onChange={e => setInputKey(e.target.value)}
+        style={{ padding: "8px", width: "200px", marginBottom: "12px" }}
+      /><br />
+      <button onClick={() => { if (inputKey === MASTER_KEY) onSuccess(); }} style={{ padding: "8px 16px" }}>입장하기</button>
     </div>
   );
+}
+
+export default function App() {
+  const [authorized, setAuthorized] = useState(false);
+  return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
+}
 
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
@@ -68,9 +58,7 @@ export function FullAutomationApp() {
   const [gradePassed, setGradePassed] = useState([]);
   const [gradeFailed, setGradeFailed] = useState([]);
 
-  useEffect(() => {
-    setPrivateList(PRIVATE_OWNERS);
-  }, []);
+  useEffect(() => { setPrivateList(PRIVATE_OWNERS); }, []);
 
   const readJson = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -93,15 +81,10 @@ export function FullAutomationApp() {
     reader.readAsArrayBuffer(file);
   });
 
-  // ✅ 중복 문제 해결된 버전
   const downloadExcel = (data, filename) => {
     const processed = data.map((r) => {
       const { A, B, ...rest } = r;
-      return {
-        "관리번호": A || "",
-        "기반시설물명": B || "",
-        ...rest,
-      };
+      return { "관리번호": A || "", "기반시설물명": B || "", ...rest };
     });
     const ws = XLSX.utils.json_to_sheet(processed);
     const wb = XLSX.utils.book_new();
@@ -189,6 +172,7 @@ export function FullAutomationApp() {
     setPercentage(((raw / 20) * 100).toFixed(1));
   };
 
+  // 🧩 UI 컴포넌트는 그대로 유지하거나 수정 필요 시 말해주세요.
   return (
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
@@ -289,4 +273,4 @@ export function FullAutomationApp() {
       </div>
     </div>
   );
-   }
+}
