@@ -13,6 +13,8 @@ const LOCAL_GOV_LIST = [
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 
 export default function App() {
+  return authorized ? <FullAutomationApp /> : <LoginComponent />;
+}
   const [authorized, setAuthorized] = useState(false);
   const [inputKey, setInputKey] = useState("");
   const MASTER_KEY = "k.infra";
@@ -42,9 +44,8 @@ export default function App() {
       )}
     </div>
   );
-}
 
-export default function FullAutomationApp() {
+export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
