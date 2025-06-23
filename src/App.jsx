@@ -33,6 +33,7 @@ function LoginComponent({ onSuccess }) {
       }}>
         <h2 style={{ marginBottom: '8px', fontSize: '20px' }}>🔒 인증이 필요합니다</h2>
         <p style={{ fontSize: '14px', marginBottom: '20px', color: '#666' }}>기반터 발급 KEY를 입력하세요</p>
+
         <input
           type="password"
           placeholder="KEY 입력"
@@ -41,24 +42,26 @@ function LoginComponent({ onSuccess }) {
           style={{
             padding: '10px',
             width: '100%',
-            marginBottom: '16px',
             borderRadius: '6px',
-            border: '1px solid #ccc'
+            border: '1px solid #ccc',
+            marginBottom: '16px',
+            boxSizing: 'border-box'
           }}
         />
+
         <button
           onClick={() => {
             if (inputKey === MASTER_KEY) onSuccess();
             else alert("KEY가 일치하지 않습니다.");
           }}
           style={{
-            padding: '10px 16px',
+            padding: '10px 0',
+            width: '90%',
             backgroundColor: '#0d6efd',
             color: '#fff',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            width: '100%',
             fontWeight: 'bold'
           }}
         >
