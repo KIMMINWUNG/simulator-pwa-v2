@@ -1,11 +1,11 @@
-// App.jsx
+// App.jsx (통합 버전)
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
 
 const LOCAL_GOV_LIST = [
-  "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
+  "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
   "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
 ];
@@ -15,58 +15,12 @@ const MASTER_KEY = "k.infra";
 function LoginComponent({ onSuccess }) {
   const [inputKey, setInputKey] = useState("");
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{
-        width: '360px',
-        background: '#ffffff',
-        padding: '30px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        textAlign: 'center'
-      }}>
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
+      <div style={{ width: '360px', background: '#ffffff', padding: '30px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
         <h2 style={{ marginBottom: '8px', fontSize: '20px' }}>🔒 인증이 필요합니다</h2>
         <p style={{ fontSize: '14px', marginBottom: '20px', color: '#666' }}>기반터 발급 KEY를 입력하세요</p>
-
-        <input
-          type="password"
-          placeholder="KEY 입력"
-          value={inputKey}
-          onChange={e => setInputKey(e.target.value)}
-          style={{
-            padding: '10px',
-            width: '100%',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            marginBottom: '16px',
-            boxSizing: 'border-box'
-          }}
-        />
-
-        <button
-          onClick={() => {
-            if (inputKey === MASTER_KEY) onSuccess();
-            else alert("KEY가 일치하지 않습니다.");
-          }}
-          style={{
-            padding: '10px 0',
-            width: '90%',
-            backgroundColor: '#0d6efd',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          입장하기
-        </button>
+        <input type="password" placeholder="KEY 입력" value={inputKey} onChange={e => setInputKey(e.target.value)} style={{ padding: '10px', width: '100%', borderRadius: '6px', border: '1px solid #ccc', marginBottom: '16px', boxSizing: 'border-box' }} />
+        <button onClick={() => { if (inputKey === MASTER_KEY) onSuccess(); else alert("KEY가 일치하지 않습니다."); }} style={{ padding: '10px 0', width: '90%', backgroundColor: '#0d6efd', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>입장하기</button>
       </div>
     </div>
   );
@@ -84,11 +38,14 @@ export function FullAutomationApp() {
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
   const [planFile, setPlanFile] = useState(null);
+  const [ordinanceFile, setOrdinanceFile] = useState(null);
+
   const [planScore, setPlanScore] = useState(null);
   const [planRate, setPlanRate] = useState(null);
   const [planTotal, setPlanTotal] = useState(0);
   const [planDone, setPlanDone] = useState(0);
   const [planMissing, setPlanMissing] = useState([]);
+
   const [totalCount, setTotalCount] = useState(0);
   const [targetCount, setTargetCount] = useState(0);
   const [numerator, setNumerator] = useState(0);
@@ -99,6 +56,11 @@ export function FullAutomationApp() {
   const [groupExcluded, setGroupExcluded] = useState([]);
   const [gradePassed, setGradePassed] = useState([]);
   const [gradeFailed, setGradeFailed] = useState([]);
+
+  const [ordinanceScore, setOrdinanceScore] = useState(null);
+  const [ordinanceRate, setOrdinanceRate] = useState(null);
+  const [ordinanceNumerator, setOrdinanceNumerator] = useState(0);
+  const [ordinanceDenominator, setOrdinanceDenominator] = useState(0);
 
   useEffect(() => { setPrivateList(PRIVATE_OWNERS); }, []);
 
@@ -116,6 +78,22 @@ export function FullAutomationApp() {
     reader.readAsArrayBuffer(file);
   });
 
+  const handleOrdinanceScore = async () => {
+    if (!ordinanceFile || !selectedGov) return;
+    const wb = await readJson(ordinanceFile);
+    const sheet = wb[Object.keys(wb)[0]];
+
+    const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
+    const total = filtered.length;
+    const done = filtered.filter(r => r.E?.toString().trim() === "O");
+
+    setOrdinanceDenominator(total);
+    setOrdinanceNumerator(done.length);
+
+    const raw = total > 0 ? (done.length / total) * 100 * 0.2 : 0;
+    setOrdinanceScore(raw.toFixed(2));
+    setOrdinanceRate(((raw / 20) * 100).toFixed(1));
+  };
   const readRaw = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve(XLSX.read(new Uint8Array(e.target.result), { type: "array" }));
@@ -309,6 +287,26 @@ export function FullAutomationApp() {
     <div style={{ marginTop: '30px' }}>
       <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
+
+      {/* ③ 성능개선 충당금 조례 제정여부 */}
+      <div>
+        <h3>③ 성능개선 충당금 조례 제정여부</h3>
+        <input type="file" accept=".xlsx" onChange={e => setOrdinanceFile(e.target.files[0])} />
+        <button onClick={handleOrdinanceScore}>점수 산출</button>
+        <p>대상 건수 (분모): <strong>{ordinanceDenominator}</strong></p>
+        <p>조례 제정 확인 건수 (분자): <strong>{ordinanceNumerator}</strong></p>
+        <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {ordinanceScore}점</p>
+        <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {ordinanceRate}%)</p>
+      </div>
+
+      {/* ✅ 최종 통합 점수 출력 */}
+      <div style={{ marginTop: '40px', backgroundColor: '#f1f5f9', padding: '20px', borderRadius: '8px', textAlign: 'center', border: '2px solid #90caf9' }}>
+        <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>📊 최종 통합 점수</h2>
+        <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
+          {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
+        </p>
+      </div>
+    </div>
             </div>
           </div>
         </div>
