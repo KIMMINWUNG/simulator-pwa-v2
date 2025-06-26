@@ -7,7 +7,7 @@ import { PRIVATE_OWNERS } from "./privateList";
 const LOCAL_GOV_LIST = [
   "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
   "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
-  "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
+  "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
 ];
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 const MASTER_KEY = "k.infra";
@@ -289,7 +289,7 @@ export function FullAutomationApp() {
       <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
 
       {/* ③ 성능개선 충당금 조례 제정여부 */}
-      <div>
+      <div style={{ marginTop: '20px' }}>
         <h3>③ 성능개선 충당금 조례 제정여부</h3>
         <input type="file" accept=".xlsx" onChange={e => setOrdinanceFile(e.target.files[0])} />
         <button onClick={handleOrdinanceScore}>점수 산출</button>
@@ -304,13 +304,12 @@ export function FullAutomationApp() {
         <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>📊 최종 통합 점수</h2>
         <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
           {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
-        </p>
-      </div>
-    </div>
-            </div>
-          </div>
+         </p>
         </div>
+       </div>
       </div>
+     </div>
     </div>
-  );
-}
+   </div>
+   );
+ }
