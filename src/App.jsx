@@ -1,4 +1,4 @@
-// App.jsx (통합 버전)
+// App.jsx
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
@@ -30,11 +30,11 @@ export default function App() {
   const [authorized, setAuthorized] = useState(false);
   return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
 }
-
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
+
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
   const [planFile, setPlanFile] = useState(null);
@@ -62,8 +62,9 @@ export function FullAutomationApp() {
   const [ordinanceNumerator, setOrdinanceNumerator] = useState(0);
   const [ordinanceDenominator, setOrdinanceDenominator] = useState(0);
 
-  useEffect(() => { setPrivateList(PRIVATE_OWNERS); }, []);
-
+  useEffect(() => {
+    setPrivateList(PRIVATE_OWNERS);
+  }, []);
   const readJson = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -78,22 +79,6 @@ export function FullAutomationApp() {
     reader.readAsArrayBuffer(file);
   });
 
-  const handleOrdinanceScore = async () => {
-    if (!ordinanceFile || !selectedGov) return;
-    const wb = await readJson(ordinanceFile);
-    const sheet = wb[Object.keys(wb)[0]];
-
-    const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
-    const total = filtered.length;
-    const done = filtered.filter(r => r.E?.toString().trim() === "O");
-
-    setOrdinanceDenominator(total);
-    setOrdinanceNumerator(done.length);
-
-    const raw = total > 0 ? (done.length / total) * 100 * 0.2 : 0;
-    setOrdinanceScore(raw.toFixed(2));
-    setOrdinanceRate(((raw / 20) * 100).toFixed(1));
-  };
   const readRaw = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve(XLSX.read(new Uint8Array(e.target.result), { type: "array" }));
@@ -111,7 +96,6 @@ export function FullAutomationApp() {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
-
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) return;
     const planWB = await readJson(planFile);
@@ -141,7 +125,6 @@ export function FullAutomationApp() {
     }));
     downloadExcel(data, "미제출_기관_리스트.xlsx");
   };
-
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) return;
     const noticeWB = await readRaw(noticeFile);
@@ -192,19 +175,33 @@ export function FullAutomationApp() {
     setPercentage(((raw / 20) * 100).toFixed(1));
   };
 
-  // 🧩 UI 컴포넌트는 그대로 유지하거나 수정 필요 시 말해주세요.
+  const handleOrdinanceScore = async () => {
+    if (!ordinanceFile || !selectedGov) return;
+    const wb = await readJson(ordinanceFile);
+    const sheet = wb[Object.keys(wb)[0]];
+
+    const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
+    const total = filtered.length;
+    const done = filtered.filter(r => r.E?.toString().trim() === "O");
+
+    setOrdinanceDenominator(total);
+    setOrdinanceNumerator(done.length);
+
+    const raw = total > 0 ? (done.length / total) * 100 * 0.2 : 0;
+    setOrdinanceScore(raw.toFixed(2));
+    setOrdinanceRate(((raw / 20) * 100).toFixed(1));
+  };
   return (
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
         <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
-        <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
           <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
         </div>
 
         <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>지자체 합동평가</h1>
         <h2 style={{ textAlign: 'center' }}>시설 안전관리 수준 강화 지표(기반시설관리법) <br />점수 자동화 프로그램</h2>
-
         <div className="form-group">
           <label>지자체 선택:</label>
           <select onChange={e => setSelectedGov(e.target.value)} value={selectedGov}>
@@ -216,100 +213,102 @@ export function FullAutomationApp() {
         <div style={{ margin: '12px 0' }}>
           <label style={{ marginRight: '12px' }}>민간관리자 또는 민자사업자 관리주체의 DB를 제외하시겠습니까?</label>
           <select value={excludePrivate ? "네" : "아니오"} onChange={e => setExcludePrivate(e.target.value === "네")}> 
-  <option>네</option>
-  <option>아니오</option>
-</select>
+            <option>네</option>
+            <option>아니오</option>
+          </select>
         </div>
 
+        {/* 🧱 세 점수 박스 가로 정렬 */}
         <div style={{ display: 'flex', gap: '24px', marginTop: '20px' }}>
-  {/* ① 실행계획 제출여부 */}
-  <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
-    <h3>① 기반시설 관리 실행계획 제출여부</h3>
-    <label>실행계획 확정현황 업로드:</label>
-    <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
-    <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
-    <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
-    <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
-    {planMissing.length > 0 && (
-      <button onClick={handlePlanDownload} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px' }}>
-        미제출 기관 리스트 다운로드
-      </button>
-    )}
-    <div style={{ marginTop: '40px' }}>
-      <p style={{ color:'#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
-      <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
-    </div>
-  </div>
+          {/* 실행계획 박스 */}
+          <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
+            <h3>① 기반시설 관리 실행계획 제출여부</h3>
+            <label>실행계획 확정현황 업로드:</label>
+            <input type="file" accept=".xlsx" onChange={e => setPlanFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
+            <button className="run-button" onClick={handlePlanScore}>점수 산출</button>
+            <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
+            <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
+            {planMissing.length > 0 && (
+              <button onClick={handlePlanDownload} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0', padding: '6px 12px', borderRadius: '4px' }}>
+                미제출 기관 리스트 다운로드
+              </button>
+            )}
+            <div style={{ marginTop: '30px' }}>
+              <p style={{ color:'#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
+              <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
+            </div>
+          </div>
 
-  {/* ② 최소유지관리기준 만족여부 */}
-  <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
-    <h3>② 최소유지관리기준 만족여부</h3>
-    <label>고시문 업로드:</label>
-    <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
-    <label>실적DB 업로드:</label>
-    <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
-    <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
-<p style={{ fontSize: '13px', color: '#e57373', marginTop: '8px' }}>
-  ❗DB가 많은 경우 점수 산출에 시간이 걸릴 수 있습니다.
-</p>
+          {/* 최소유지관리 박스 */}
+          <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
+            <h3>② 최소유지관리기준 만족여부</h3>
+            <label>고시문 업로드:</label>
+            <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
+            <label>실적DB 업로드:</label>
+            <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
+            <button className="run-button" onClick={handleMaintainScore}>점수 산출</button>
+            <p style={{ fontSize: '13px', color: '#e57373', marginTop: '8px' }}>❗DB가 많은 경우 점수 산출에 시간이 걸릴 수 있습니다.</p>
+            <p>총 DB 개수: <strong>{totalCount}</strong></p>
+            <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
 
-    <p>총 DB 개수: <strong>{totalCount}</strong></p>
-    <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
-    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-      {groupIncluded.length > 0 && (
-        <button onClick={() => downloadExcel(groupIncluded, "관리그룹_포함DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-          관리그룹 포함 DB
-        </button>
-      )}
-      {groupExcluded.length > 0 && (
-        <button onClick={() => downloadExcel(groupExcluded, "관리그룹_제외DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-          관리그룹 제외 DB
-        </button>
-      )}
-    </div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              {groupIncluded.length > 0 && (
+                <button onClick={() => downloadExcel(groupIncluded, "관리그룹_포함DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+                  관리그룹 포함 DB
+                </button>
+              )}
+              {groupExcluded.length > 0 && (
+                <button onClick={() => downloadExcel(groupExcluded, "관리그룹_제외DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+                  관리그룹 제외 DB
+                </button>
+              )}
+            </div>
 
-    <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
-    <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
+            <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
+            <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
 
-    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-      {gradePassed.length > 0 && (
-        <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-          목표등급 만족 DB
-        </button>
-      )}
-      {gradeFailed.length > 0 && (
-        <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-          목표등급 불만족 DB
-        </button>
-      )}
-    </div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              {gradePassed.length > 0 && (
+                <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+                  목표등급 만족 DB
+                </button>
+              )}
+              {gradeFailed.length > 0 && (
+                <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
+                  목표등급 불만족 DB
+                </button>
+              )}
+            </div>
 
-    <div style={{ marginTop: '30px' }}>
-      <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
-      <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
+            <div style={{ marginTop: '30px' }}>
+              <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
+              <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
+            </div>
+          </div>
 
-      {/* ③ 성능개선 충당금 조례 제정여부 */}
-      <div style={{ marginTop: '20px' }}>
-        <h3>③ 성능개선 충당금 조례 제정여부</h3>
-        <input type="file" accept=".xlsx" onChange={e => setOrdinanceFile(e.target.files[0])} />
-        <button onClick={handleOrdinanceScore}>점수 산출</button>
-        <p>대상 건수 (분모): <strong>{ordinanceDenominator}</strong></p>
-        <p>조례 제정 확인 건수 (분자): <strong>{ordinanceNumerator}</strong></p>
-        <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {ordinanceScore}점</p>
-        <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {ordinanceRate}%)</p>
-      </div>
-
-      {/* ✅ 최종 통합 점수 출력 */}
-      <div style={{ marginTop: '40px', backgroundColor: '#f1f5f9', padding: '20px', borderRadius: '8px', textAlign: 'center', border: '2px solid #90caf9' }}>
-        <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>📊 최종 통합 점수</h2>
-        <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
-          {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
-         </p>
+          {/* 충당금 조례 박스 */}
+          <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
+            <h3>③ 성능개선 충당금 조례 제정여부</h3>
+            <label>조례 확인 엑셀 업로드:</label>
+            <input type="file" accept=".xlsx" onChange={e => setOrdinanceFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
+            <button className="run-button" onClick={handleOrdinanceScore}>점수 산출</button>
+            <p>대상 건수 (분모): <strong>{ordinanceDenominator}</strong></p>
+            <p>조례 제정 확인 건수 (분자): <strong>{ordinanceNumerator}</strong></p>
+            <div style={{ marginTop: '30px' }}>
+              <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {ordinanceScore}점</p>
+              <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {ordinanceRate}%)</p>
+            </div>
+          </div>
         </div>
-       </div>
+
+        {/* 🎯 최종 점수 통합 박스 */}
+        <div style={{ marginTop: '40px', backgroundColor: '#f1f5f9', padding: '20px', borderRadius: '8px', textAlign: 'center', border: '2px solid #90caf9' }}>
+          <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>📊 최종 통합 점수</h2>
+          <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
+            {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
+          </p>
+        </div>
       </div>
-     </div>
     </div>
-   </div>
-   );
- }
+  );
+}
