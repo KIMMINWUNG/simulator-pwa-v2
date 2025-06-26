@@ -193,7 +193,7 @@ export function FullAutomationApp() {
   };
   return (
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-      <div className="simulator" style={{ padding: '24px', width: '1800px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
+      <div className="simulator" style={{ padding: '24px', width: '3000px', background: '#eceff1', borderRadius: '12px', position: 'relative', paddingTop: '48px' }}>
         <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '8px', left: '8px', height: '36px' }} />
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
@@ -301,12 +301,19 @@ export function FullAutomationApp() {
           </div>
         </div>
 
-        {/* 🎯 최종 점수 통합 박스 */}
-        <div style={{ marginTop: '40px', backgroundColor: '#f1f5f9', padding: '20px', borderRadius: '8px', textAlign: 'center', border: '2px solid #90caf9' }}>
-          <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>📊 최종 통합 점수</h2>
-          <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
-            {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
-          </p>
+        {/* ✅ 최종 통합 점수 출력 (스타일 통일) */}
+<div style={{ 
+  flex: 1, 
+  background: '#fff', 
+  border: '1px solid #ccc', 
+  borderRadius: '8px', 
+  padding: '16px', 
+  marginTop: '20px' 
+}}>
+  <h3>최종 통합 점수</h3>
+  <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
+    {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
+  </p>
         </div>
       </div>
     </div>
