@@ -482,7 +482,8 @@ export function FullAutomationApp() {
   alignItems: 'center',
   flexWrap: 'wrap'
 }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+  <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+  <footer style={{ width: '70vw', maxWidth: '1200px', backgroundColor: '#f0f4f8', padding: '16px 20px' }}>
     <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
     <div>
       <strong>국토안전관리원</strong><br />
@@ -493,6 +494,7 @@ export function FullAutomationApp() {
     ⓒ 2025 김민웅 All rights reserved.
   </div>
 </footer>
+     </div>
     </div>
   );
 }
