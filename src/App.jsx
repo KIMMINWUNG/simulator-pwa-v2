@@ -312,7 +312,6 @@ export function FullAutomationApp() {
   return (
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '60vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
-        <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '15px', left: '15px', height: '45px' }} />
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
           <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
@@ -471,6 +470,29 @@ export function FullAutomationApp() {
           </p>
         </div>
       </div>
+      <footer style={{
+  backgroundColor: '#f0f4f8',
+  padding: '16px 24px',
+  marginTop: '40px',
+  fontSize: '13px',
+  color: '#444',
+  borderTop: '1px solid #ccc',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  flexWrap: 'wrap'
+}}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
+    <div>
+      <strong>국토안전관리원</strong><br />
+      &nbsp; 담당자: 김민웅 직원 &nbsp; | &nbsp; 연락처: 055-771-8497 | &nbsp; 주소: 경상남도 진주시 사들로 123번길 40 배종프라임 7층, 기반시설관리실
+    </div>
+  </div>
+  <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+    ⓒ 2025 김민웅 All rights reserved.
+  </div>
+</footer>
     </div>
   );
 }
