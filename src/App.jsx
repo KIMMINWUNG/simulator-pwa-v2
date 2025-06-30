@@ -4,11 +4,7 @@ import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
 
-const LOCAL_GOV_LIST = [
-  "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
-  "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
-  "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
-];
+const LOCAL_GOV_LIST = [ "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도", "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도" ];
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 const MASTER_KEY = "k.infra";
 
@@ -42,7 +38,43 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
+  return (
+    <>
+      {authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />}
+      <Footer />
+    </>
+  );
+}
+function Footer() {
+  return (
+    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+      <footer style={{
+        width: '70vw',
+        maxWidth: '1200px',
+        backgroundColor: '#f0f4f8',
+        padding: '16px 20px',
+        marginTop: '40px',
+        fontSize: '13px',
+        color: '#444',
+        borderTop: '1px solid #ccc',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
+          <div>
+            <strong>국토안전관리원</strong><br />
+            담당자: 김OO &nbsp; | &nbsp; 연락처: 042-000-0000 &nbsp; | &nbsp; 주소: 경상남도 진주시
+          </div>
+        </div>
+        <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+          ⓒ 2025 Korea Infrastructure Safety & Technology Corp. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  );
 }
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
@@ -108,7 +140,6 @@ export function FullAutomationApp() {
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
-
   const readJson = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -159,6 +190,7 @@ export function FullAutomationApp() {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
+
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -198,7 +230,6 @@ export function FullAutomationApp() {
       setIsLoadingPlan(false);
     }
   };
-
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
       alert("지자체 선택, 고시문 파일 및 실적DB 파일 업로드가 필요합니다.");
@@ -308,161 +339,11 @@ export function FullAutomationApp() {
       setIsLoadingOrdinance(false);
     }
   };
-  
+
   return (
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '60vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
         <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '15px', left: '15px', height: '45px' }} />
-
-        <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
-          <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
-        </div>
-
-        <h1 style={{ fontSize: '28px', textAlign: 'center', fontWeight: 'bold' }}>지자체 합동평가</h1>
-        <h2 style={{ textAlign: 'center' }}>
-          시설 안전관리 수준 강화 지표(기반시설관리법) <br />
-          점수 자동화 프로그램
-        </h2>
-
-        <div className="form-group" style={{ marginTop: '16px' }}>
-          <label>지자체 선택:</label>
-          <select onChange={e => setSelectedGov(e.target.value)} value={selectedGov}>
-            <option value="">선택하세요</option>
-            {LOCAL_GOV_LIST.map(g => <option key={g}>{g}</option>)}
-          </select>
-        </div>
-
-        <div style={{ margin: '12px 0' }}>
-          <label style={{ marginRight: '12px' }}>
-            민간관리자 또는 민자사업자 관리주체의 DB를 제외하시겠습니까?
-          </label>
-          <select value={excludePrivate ? "네" : "아니오"} onChange={e => setExcludePrivate(e.target.value === "네")}>
-            <option>네</option>
-            <option>아니오</option>
-          </select>
-        </div>
-
-        {/* 세 점수 항목 박스 정렬 */}
-        <div style={{ display: 'flex', gap: '24px', marginTop: '20px', flexWrap: 'wrap' }}>
-          {[
-            {
-              title: "① 기반시설 관리 실행계획 제출여부",
-              content: (
-                <>
-                  <label>실행계획 확정현황 업로드:</label>
-                  <input
-                    type="file"
-                    accept=".xlsx"
-                    onChange={e => setPlanFile(e.target.files[0])}
-                    style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }}
-                  />
-                  <button className="run-button" onClick={handlePlanScore} disabled={isLoadingPlan}>
-                    {isLoadingPlan ? "⏳ 점수 산출 중..." : "점수 산출"}
-                  </button>
-                  {isLoadingPlan && <p style={{ color: '#999' }}>처리 중입니다. 잠시만 기다려주세요.</p>}
-                  <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
-                  <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
-                  {planMissing.length > 0 && (
-                    <button onClick={() => {
-                      const data = planMissing.map((r, i) => ({
-                        "순번": i + 1,
-                        "관리계획 수립기관": r.B || "",
-                        "작성기관": r.C || "",
-                        "시설종류": r.D || "",
-                        "담당자": r.F || "",
-                      }));
-                      downloadExcel(data, "미제출_기관_리스트.xlsx");
-                    }} style={{
-                      backgroundColor: '#cce4f6',
-                      border: '1px solid #99c8e0',
-                      padding: '6px 12px',
-                      borderRadius: '4px'
-                    }}>
-                      미제출 기관 리스트 다운로드
-                    </button>
-                  )}
-                  <div style={{ marginTop: '30px' }}>
-                    <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {planScore}점</p>
-                    <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(10점 만점 기준, {planRate}%)</p>
-                  </div>
-                </>
-              )
-            },
-            {
-              title: "② 최소유지관리기준 만족여부",
-              content: (
-                <>
-                  <label>고시문 업로드:</label>
-                  <input type="file" accept=".xlsx" onChange={e => setNoticeFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px' }} />
-                  <label>실적DB 업로드:</label>
-                  <input type="file" accept=".xlsx" onChange={e => setDbFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
-                  <button className="run-button" onClick={handleMaintainScore} disabled={isLoadingMaintain}>
-                    {isLoadingMaintain ? "⏳ 점수 산출 중..." : "점수 산출"}
-                  </button>
-                  {isLoadingMaintain && <p style={{ color: '#999' }}>처리 중입니다. 잠시만 기다려주세요.</p>}
-                  <p style={{ fontSize: '13px', color: '#e57373', marginTop: '8px' }}>❗DB가 많은 경우 점수 산출에 시간이 걸릴 수 있습니다.</p>
-                  <p>총 DB 개수: <strong>{totalCount}</strong></p>
-                  <p>관리그룹 대상 개수: <strong>{targetCount}</strong></p>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                    {groupIncluded.length > 0 && (
-                      <button onClick={() => downloadExcel(groupIncluded, "관리그룹_포함DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                        관리그룹 포함 DB
-                      </button>
-                    )}
-                    {groupExcluded.length > 0 && (
-                      <button onClick={() => downloadExcel(groupExcluded, "관리그룹_제외DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                        관리그룹 제외 DB
-                      </button>
-                    )}
-                  </div>
-                  <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
-                  <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                    {gradePassed.length > 0 && (
-                      <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                        목표등급 만족 DB
-                      </button>
-                    )}
-                    {gradeFailed.length > 0 && (
-                      <button onClick={() => downloadExcel(gradeFailed, "목표등급_불만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
-                        목표등급 불만족 DB
-                      </button>
-                    )}
-                  </div>
-                  <div style={{ marginTop: '30px' }}>
-                    <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {score}점</p>
-                    <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {percentage}%)</p>
-                  </div>
-                </>
-              )
-            },
-            {
-              title: "③ 성능개선 충당금 조례 제정여부",
-              content: (
-                <>
-                  <label>조례 확인 엑셀 업로드:</label>
-                  <input type="file" accept=".xlsx" onChange={e => setOrdinanceFile(e.target.files[0])} style={{ display: 'block', width: '100%', maxWidth: '250px', marginBottom: '12px' }} />
-                  <button className="run-button" onClick={handleOrdinanceScore} disabled={isLoadingOrdinance}>
-                    {isLoadingOrdinance ? "⏳ 점수 산출 중..." : "점수 산출"}
-                  </button>
-                  {isLoadingOrdinance && <p style={{ color: '#999' }}>처리 중입니다. 잠시만 기다려주세요.</p>}
-                  <p>대상 건수 (분모): <strong>{ordinanceDenominator}</strong></p>
-                  <p>조례 제정 확인 건수 (분자): <strong>{ordinanceNumerator}</strong></p>
-                  <div style={{ marginTop: '30px' }}>
-                    <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {ordinanceScore}점</p>
-                    <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {ordinanceRate}%)</p>
-                  </div>
-                </>
-              )
-            }
-          ].map((box, idx) => (
-            <div key={idx} style={{ flex: 1, minWidth: 0, maxWidth: '100%', background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px' }}>
-              <h3>{box.title}</h3>
-              {box.content}
-            </div>
-          ))}
-        </div>
-
         {/* ✅ 최종 통합 점수 출력 */}
         <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginTop: '20px' }}>
           <h3>최종 통합 점수</h3>
@@ -471,6 +352,10 @@ export function FullAutomationApp() {
           </p>
         </div>
       </div>
+      {/* 시뮬레이터 박스 닫기 */}
     </div>
+
+    {/* ✅ Footer 추가 */}
+    <Footer />
   );
 }
