@@ -474,7 +474,7 @@ export function FullAutomationApp() {
     </div>
     
     {/* Footer */}
-    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ width: '100vw', , overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <footer style={{
         width: '90vw',
         maxWidth: '1200px',
