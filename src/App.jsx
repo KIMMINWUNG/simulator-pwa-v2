@@ -451,8 +451,7 @@ export function FullAutomationApp() {
             {Number(planScore || 0) + Number(score || 0) + Number(ordinanceScore || 0)} 점 / 50점 만점
           </p>
         </div>
-      </div> {/* .simulator */}
-    </div>   {/* wrapper */}
-
-  ); // FullAutomationApp 끝
+      </div>
+    </div>
+  );
 }
