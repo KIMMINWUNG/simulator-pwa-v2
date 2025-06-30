@@ -42,12 +42,7 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  return (
-    <>
-      {authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />}
-      <Footer />
-    </>
-  );
+  return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
 }
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
@@ -113,6 +108,7 @@ export function FullAutomationApp() {
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
+
   const readJson = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -163,7 +159,6 @@ export function FullAutomationApp() {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
-
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -203,6 +198,7 @@ export function FullAutomationApp() {
       setIsLoadingPlan(false);
     }
   };
+
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
       alert("지자체 선택, 고시문 파일 및 실적DB 파일 업로드가 필요합니다.");
@@ -312,11 +308,13 @@ export function FullAutomationApp() {
       setIsLoadingOrdinance(false);
     }
   };
-
+  
   return (
-  <>
+    <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '60vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
+        <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '15px', left: '15px', height: '45px' }} />
+
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
           <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
         </div>
@@ -344,6 +342,7 @@ export function FullAutomationApp() {
             <option>아니오</option>
           </select>
         </div>
+
         {/* 세 점수 항목 박스 정렬 */}
         <div style={{ display: 'flex', gap: '24px', marginTop: '20px', flexWrap: 'wrap' }}>
           {[
@@ -465,7 +464,7 @@ export function FullAutomationApp() {
           ))}
         </div>
 
-        {/* 최종 통합 점수 박스 */}
+        {/* ✅ 최종 통합 점수 출력 */}
         <div style={{ flex: 1, background: '#fff', border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginTop: '20px' }}>
           <h3>최종 통합 점수</h3>
           <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e88e5' }}>
