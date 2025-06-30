@@ -314,6 +314,7 @@ export function FullAutomationApp() {
   };
 
   return (
+  <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '60vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
@@ -474,7 +475,7 @@ export function FullAutomationApp() {
       </div>
     </div>
     
-    {/* ✅ Footer 추가 */}
+    {/* Footer */}
     <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
       <footer style={{
         width: '70vw',
@@ -494,7 +495,7 @@ export function FullAutomationApp() {
           <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
           <div>
             <strong>국토안전관리원 기반시설관리실</strong><br />
-            담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리a실
+            담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리실
           </div>
         </div>
         <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
@@ -502,5 +503,6 @@ export function FullAutomationApp() {
         </div>
       </footer>
     </div>
-  );
+  </>
+);
 }
