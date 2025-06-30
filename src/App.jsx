@@ -313,7 +313,6 @@ export function FullAutomationApp() {
     <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '60vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
-        <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ position: 'absolute', top: '15px', left: '15px', height: '45px' }} />
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
           <strong>🔒 안내 :</strong> 이 시뮬레이터는 사용자의 브라우저 내에서만 엑셀 데이터를 처리하며, 업로드된 파일은 서버에 저장되지 않습니다.
@@ -361,8 +360,8 @@ export function FullAutomationApp() {
                     {isLoadingPlan ? "⏳ 점수 산출 중..." : "점수 산출"}
                   </button>
                   {isLoadingPlan && <p style={{ color: '#999' }}>처리 중입니다. 잠시만 기다려주세요.</p>}
-                  <p>제출 대상 기관 수: <strong>{planTotal}</strong></p>
-                  <p>기한 내 제출 완료 건수: <strong>{planDone}</strong></p>
+                  <p>제출 대상 기관 수(분모): <strong>{planTotal}</strong></p>
+                  <p>기한 내 제출 완료 건수(분자): <strong>{planDone}</strong></p>
                   {planMissing.length > 0 && (
                     <button onClick={() => {
                       const data = planMissing.map((r, i) => ({
@@ -416,8 +415,8 @@ export function FullAutomationApp() {
                       </button>
                     )}
                   </div>
-                  <p>분모(등급 확인 대상): <strong>{denominator}</strong></p>
-                  <p>분자(목표등급 만족): <strong>{numerator}</strong></p>
+                  <p>등급 확인 대상(분모): <strong>{denominator}</strong></p>
+                  <p>목표등급 만족(분자): <strong>{numerator}</strong></p>
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                     {gradePassed.length > 0 && (
                       <button onClick={() => downloadExcel(gradePassed, "목표등급_만족DB.xlsx")} style={{ backgroundColor: '#cce4f6', border: '1px solid #99c8e0' }}>
@@ -447,8 +446,8 @@ export function FullAutomationApp() {
                     {isLoadingOrdinance ? "⏳ 점수 산출 중..." : "점수 산출"}
                   </button>
                   {isLoadingOrdinance && <p style={{ color: '#999' }}>처리 중입니다. 잠시만 기다려주세요.</p>}
-                  <p>대상 건수 (분모): <strong>{ordinanceDenominator}</strong></p>
-                  <p>조례 제정 확인 건수 (분자): <strong>{ordinanceNumerator}</strong></p>
+                  <p>대상 건수(분모): <strong>{ordinanceDenominator}</strong></p>
+                  <p>조례 제정 확인 건수(분자): <strong>{ordinanceNumerator}</strong></p>
                   <div style={{ marginTop: '30px' }}>
                     <p style={{ color: '#e53935', fontWeight: 'bold', fontSize: '20px' }}>최종 점수: {ordinanceScore}점</p>
                     <p style={{ fontWeight: 'normal', marginTop: '-10px' }}>(20점 만점 기준, {ordinanceRate}%)</p>
