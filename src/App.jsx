@@ -50,7 +50,6 @@ export default function App() {
   const [authorized, setAuthorized] = useState(false);
   return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
 }
-
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
@@ -111,13 +110,13 @@ export function FullAutomationApp() {
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
+
   const validateHeader = (sheet, expectedHeader) => {
     if (!sheet || !Array.isArray(sheet)) return false;
     const actualHeader = Object.values(sheet[0]);
     if (actualHeader.length !== expectedHeader.length) return false;
     return expectedHeader.every((v, i) => v === actualHeader[i]);
   };
-
   const readJson = (file, type) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -125,11 +124,10 @@ export function FullAutomationApp() {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
         const json = {};
         const expectedHeaders = {
-          plan: ["구분", "관리계획 수립기관", "작성기관", "시설종류", "제출일시", "담당자", "결재현황", "결재이력", "결재-담당자"],
-          db: ["관리번호", "기반시설물명", "관리그룹", "시설유형", "시설명", "점검유형", "점검일", "지자체", "관리주체", "관리주체 하위조직", "기관상세", "준공일", "등급"],
-          ordinance: ["구분", "관리계획 수립기관", "작성기관", "시설종류", "조례 제정여부"]
+          plan: HEADER_PLAN,
+          db: HEADER_DB,
+          ordinance: HEADER_ORDINANCE
         };
-
         const headerType = expectedHeaders[type];
 
         wb.SheetNames.forEach(name => {
@@ -182,7 +180,7 @@ export function FullAutomationApp() {
       const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r["작성기관"]?.trim())) : filtered;
 
       const done = finalData.filter(r => {
-        const date = new Date(r["확정일자"]);
+        const date = new Date(r["제출일시"]);
         return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
       });
 
@@ -220,7 +218,6 @@ export function FullAutomationApp() {
       const db = await readJson(dbFile, "db");
       const dbSheetName = Object.keys(db)[0];
       const dbSheet = db[dbSheetName];
-
       let dbBody = dbSheet.filter(r => r["지자체"]?.trim() === selectedGov);
       if (excludePrivate) {
         dbBody = dbBody.filter(r => !privateList.includes(r["관리주체"]?.trim()));
@@ -301,7 +298,7 @@ export function FullAutomationApp() {
     }
   };
 
-  return (
+ return (
     <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '70vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
