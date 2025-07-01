@@ -7,7 +7,7 @@ import { PRIVATE_OWNERS } from "./privateList";
 // 고정된 헤더 정의 (순서와 값)
 const HEADER_PLAN = ['구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'];
 const HEADER_DB = ['관리번호', '기반시설물명', '시설물종별', '관리그룹', '지자체', '시설명', '준공일자', '시설유형', '관리주체', '등급'];
-const HEADER_ORDINANCE = ['구분', '관리계획 수립기관', '작성기관', '시설종류', '조례 제정여부'];
+const HEADER_ORDINANCE = ['구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'];
 const HEADER_NOTICE = ['시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타', '비대상', 'A', 'B', 'C', 'D', 'E', '우수', '양호', '보통', '미흡', '불량'];
 
 const LOCAL_GOV_LIST = [
@@ -283,7 +283,7 @@ export function FullAutomationApp() {
 
       const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       const total = filtered.length;
-      const done = filtered.filter(r => r["조례 제정여부"]?.toString().trim() === "O");
+      const done = filtered.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
 
       setOrdinanceDenominator(total);
       setOrdinanceNumerator(done.length);
