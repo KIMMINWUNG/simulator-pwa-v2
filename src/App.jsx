@@ -1,20 +1,30 @@
-// App.jsx
+// App.jsx (1/6)
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
 
-// 고정된 헤더 정의 (순서와 값)
-const HEADER_PLAN = ['구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'];
-const HEADER_DB = ['관리번호', '기반시설물명', '시설물종별', '관리그룹', '지자체', '시설명', '준공일자', '시설유형', '관리주체', '등급'];
-const HEADER_ORDINANCE = ['구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'];
-const HEADER_NOTICE = ['시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타', '비대상', 'A', 'B', 'C', 'D', 'E', '우수', '양호', '보통', '미흡', '불량'];
+const HEADER_PLAN = [
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
+];
+const HEADER_DB = [
+  '관리번호', '기반시설물명', '시설물종별', '기반시설구분', '시설물구분', '시설물종류',
+  '관리감독기관', '관리계획 수립기관', '관리주체', '관리주체 하위조직', '기관상세', '준공일', '등급'
+];
+const HEADER_ORDINANCE = [
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'
+];
+const HEADER_NOTICE = [
+  '시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타',
+  '비대상', 'A', 'B', 'C', 'D', 'E', '우수', '양호', '보통', '미흡', '불량'
+];
 
 const LOCAL_GOV_LIST = [
   "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
   "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
 ];
+
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 const MASTER_KEY = "k.infra";
 
@@ -50,10 +60,19 @@ export default function App() {
   const [authorized, setAuthorized] = useState(false);
   return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
 }
+
+// ✅ 수정된 validateHeader 함수
+const validateHeader = (actualHeader, expectedHeader) => {
+  if (!actualHeader || !Array.isArray(actualHeader)) return false;
+  if (actualHeader.length !== expectedHeader.length) return false;
+  return expectedHeader.every((v, i) => v === actualHeader[i]);
+};
+// App.jsx (2/6)
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
+
   const [noticeFile, setNoticeFile] = useState(null);
   const [dbFile, setDbFile] = useState(null);
   const [planFile, setPlanFile] = useState(null);
@@ -90,11 +109,13 @@ export function FullAutomationApp() {
   }, []);
 
   useEffect(() => {
+    // 지자체 선택 시 모든 상태 초기화
     setPlanScore(null);
     setPlanRate(null);
     setPlanTotal(0);
     setPlanDone(0);
     setPlanMissing([]);
+
     setScore(null);
     setPercentage(null);
     setGroupIncluded([]);
@@ -105,18 +126,13 @@ export function FullAutomationApp() {
     setTargetCount(0);
     setNumerator(0);
     setDenominator(0);
+
     setOrdinanceScore(null);
     setOrdinanceRate(null);
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
-
-  const validateHeader = (sheet, expectedHeader) => {
-    if (!sheet || !Array.isArray(sheet)) return false;
-    const actualHeader = Object.values(sheet[0]);
-    if (actualHeader.length !== expectedHeader.length) return false;
-    return expectedHeader.every((v, i) => v === actualHeader[i]);
-  };
+// App.jsx (3/6)
   const readJson = (file, type) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -133,7 +149,7 @@ export function FullAutomationApp() {
         wb.SheetNames.forEach(name => {
           const data = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1 });
           const sheetHeader = data[0];
-          if (!validateHeader([sheetHeader], headerType)) {
+          if (!validateHeader(sheetHeader, headerType)) {
             alert(`❗ ${name} 시트의 헤더 형식이 올바르지 않습니다.\n필수 형식: ${headerType.join(", ")}`);
             throw new Error("Invalid header");
           }
@@ -164,6 +180,14 @@ export function FullAutomationApp() {
     reader.onerror = () => reject("파일을 읽을 수 없습니다.");
     reader.readAsArrayBuffer(file);
   });
+
+  const downloadExcel = (data, filename) => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, filename);
+  };
+// App.jsx (4/6)
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -199,7 +223,7 @@ export function FullAutomationApp() {
       setIsLoadingPlan(false);
     }
   };
-
+// App.jsx (5/6)
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
       alert("지자체 선택, 고시문 파일 및 실적DB 파일 업로드가 필요합니다.");
@@ -218,7 +242,8 @@ export function FullAutomationApp() {
       const db = await readJson(dbFile, "db");
       const dbSheetName = Object.keys(db)[0];
       const dbSheet = db[dbSheetName];
-      let dbBody = dbSheet.filter(r => r["지자체"]?.trim() === selectedGov);
+
+      let dbBody = dbSheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       if (excludePrivate) {
         dbBody = dbBody.filter(r => !privateList.includes(r["관리주체"]?.trim()));
       }
@@ -232,11 +257,13 @@ export function FullAutomationApp() {
         const infra = sheet[`A${i}`]?.v?.trim();
         const fac = sheet[`B${i}`]?.v?.trim();
         if (!infra || !fac) continue;
+
         for (let col of groupCols) {
           const v = sheet[`${col}${i}`]?.v?.trim();
           const label = sheet[`${col}1`]?.v?.trim();
           if (v === "O") groupKeys.add(`${infra}||${fac}||${label}`);
         }
+
         for (let col of gradeCols) {
           const v = sheet[`${col}${i}`]?.v?.trim();
           const label = sheet[`${col}1`]?.v?.trim();
@@ -269,6 +296,7 @@ export function FullAutomationApp() {
       setIsLoadingMaintain(false);
     }
   };
+// App.jsx (6/6)
   const handleOrdinanceScore = async () => {
     if (!ordinanceFile || !selectedGov) {
       alert("지자체 선택 및 조례 파일 업로드가 필요합니다.");
@@ -298,7 +326,7 @@ export function FullAutomationApp() {
     }
   };
 
- return (
+  return (
     <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '70vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
@@ -463,34 +491,33 @@ export function FullAutomationApp() {
     </div>
     
     {/* Footer */}
-
-      <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-        <footer style={{
-          width: '90vw',
-          maxWidth: '1500px',
-          backgroundColor: '#f0f4f8',
-          padding: '16px 20px',
-          marginTop: '40px',
-          fontSize: '13px',
-          color: '#444',
-          borderTop: '1px solid #ccc',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
-            <div>
-              <strong>국토안전관리원 기반시설관리실</strong><br />
-              담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리실
-            </div>
+    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+      <footer style={{
+        width: '90vw',
+        maxWidth: '1500px',
+        backgroundColor: '#f0f4f8',
+        padding: '16px 20px',
+        marginTop: '40px',
+        fontSize: '13px',
+        color: '#444',
+        borderTop: '1px solid #ccc',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
+          <div>
+            <strong>국토안전관리원 기반시설관리실</strong><br />
+            담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리실
           </div>
-          <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
-            ⓒ 2025 Kim Min Wung. All rights reserved.
-          </div>
-        </footer>
-      </div>
-    </>
-  );
+        </div>
+        <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+          ⓒ 2025 Kim Min Wung. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  </>
+);
 }
