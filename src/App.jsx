@@ -1,14 +1,30 @@
-// App.jsx
+// App.jsx (1/6)
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
+
+const HEADER_PLAN = [
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
+];
+const HEADER_DB = [
+  '관리번호', '기반시설물명', '시설물종별', '기반시설구분', '시설물구분', '시설물종류',
+  '관리감독기관', '관리계획 수립기관', '관리주체', '관리주체 하위조직', '기관상세', '준공일', '등급'
+];
+const HEADER_ORDINANCE = [
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'
+];
+const HEADER_NOTICE = [
+  '시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타',
+  '비대상', 'A', 'B', 'C', 'D', 'E', '우수', '양호', '보통', '미흡', '불량'
+];
 
 const LOCAL_GOV_LIST = [
   "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
   "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
 ];
+
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 const MASTER_KEY = "k.infra";
 
@@ -44,6 +60,14 @@ export default function App() {
   const [authorized, setAuthorized] = useState(false);
   return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
 }
+
+// ✅ 수정된 validateHeader 함수
+const validateHeader = (actualHeader, expectedHeader) => {
+  if (!actualHeader || !Array.isArray(actualHeader)) return false;
+  if (actualHeader.length !== expectedHeader.length) return false;
+  return expectedHeader.every((v, i) => v === actualHeader[i]);
+};
+// App.jsx (2/6)
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
@@ -85,7 +109,7 @@ export function FullAutomationApp() {
   }, []);
 
   useEffect(() => {
-    // 지자체 변경 시 점수 상태 초기화
+    // 지자체 선택 시 모든 상태 초기화
     setPlanScore(null);
     setPlanRate(null);
     setPlanTotal(0);
@@ -108,26 +132,38 @@ export function FullAutomationApp() {
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
-
-  const readJson = (file) => new Promise((resolve, reject) => {
+// App.jsx (3/6)
+  const readJson = (file, type) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
         const json = {};
+        const expectedHeaders = {
+          plan: HEADER_PLAN,
+          db: HEADER_DB,
+          ordinance: HEADER_ORDINANCE
+        };
+        const headerType = expectedHeaders[type];
+
         wb.SheetNames.forEach(name => {
-          json[name] = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: "A" });
+          const data = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1 });
+          const sheetHeader = data[0];
+          if (!validateHeader(sheetHeader, headerType)) {
+            alert(`❗ ${name} 시트의 헤더 형식이 올바르지 않습니다.\n필수 형식: ${headerType.join(", ")}`);
+            throw new Error("Invalid header");
+          }
+          const rows = data.slice(1).map(row =>
+            Object.fromEntries(sheetHeader.map((key, i) => [key, row[i]]))
+          );
+          json[name] = rows;
         });
         resolve(json);
-      } catch (error) {
-        alert("엑셀 파일을 읽는 중 오류가 발생했습니다.");
-        reject(error);
+      } catch (err) {
+        reject(err);
       }
     };
-    reader.onerror = () => {
-      alert("파일을 읽을 수 없습니다. 형식이나 내용이 올바른지 확인해 주세요.");
-      reject();
-    };
+    reader.onerror = () => reject("파일을 읽을 수 없습니다.");
     reader.readAsArrayBuffer(file);
   });
 
@@ -138,27 +174,20 @@ export function FullAutomationApp() {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
         resolve(wb);
       } catch (error) {
-        alert("고시문 파일을 읽는 중 오류가 발생했습니다.");
         reject(error);
       }
     };
-    reader.onerror = () => {
-      alert("파일을 읽을 수 없습니다. 형식이나 내용이 올바른지 확인해 주세요.");
-      reject();
-    };
+    reader.onerror = () => reject("파일을 읽을 수 없습니다.");
     reader.readAsArrayBuffer(file);
   });
 
   const downloadExcel = (data, filename) => {
-    const processed = data.map((r) => {
-      const { A, B, ...rest } = r;
-      return { "관리번호": A || "", "기반시설물명": B || "", ...rest };
-    });
-    const ws = XLSX.utils.json_to_sheet(processed);
+    const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, filename);
   };
+// App.jsx (4/6)
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -167,27 +196,23 @@ export function FullAutomationApp() {
 
     setIsLoadingPlan(true);
     try {
-      const planWB = await readJson(planFile);
+      const planWB = await readJson(planFile, "plan");
       const sheetName = Object.keys(planWB)[0];
       const sheet = planWB[sheetName];
 
-      if (!sheet || !Array.isArray(sheet)) {
-        alert("파일에 유효한 시트 또는 데이터가 없습니다.");
-        return;
-      }
-
-      const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
-      const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r.C?.trim())) : filtered;
+      const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
+      const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r["작성기관"]?.trim())) : filtered;
 
       const done = finalData.filter(r => {
-        const date = new Date(r.H);
+        const date = new Date(r["제출일시"]);
         return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
       });
-      const missed = finalData.filter(r => !done.includes(r));
 
+      const missed = finalData.filter(r => !done.includes(r));
       setPlanTotal(finalData.length);
       setPlanDone(done.length);
       setPlanMissing(missed);
+
       const raw = finalData.length > 0 ? (done.length / finalData.length) * 100 * 0.1 : 0;
       setPlanScore(raw.toFixed(2));
       setPlanRate(((raw / 10) * 100).toFixed(1));
@@ -198,7 +223,7 @@ export function FullAutomationApp() {
       setIsLoadingPlan(false);
     }
   };
-
+// App.jsx (5/6)
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
       alert("지자체 선택, 고시문 파일 및 실적DB 파일 업로드가 필요합니다.");
@@ -209,24 +234,18 @@ export function FullAutomationApp() {
     try {
       const noticeWB = await readRaw(noticeFile);
       const sheet = noticeWB.Sheets[selectedGov];
-
       if (!sheet) {
-        alert(파일에 "${selectedGov}" 시트가 존재하지 않습니다.);
+        alert(`파일에 "${selectedGov}" 시트가 존재하지 않습니다.`);
         return;
       }
 
-      const db = await readJson(dbFile);
+      const db = await readJson(dbFile, "db");
       const dbSheetName = Object.keys(db)[0];
       const dbSheet = db[dbSheetName];
 
-      if (!dbSheet || !Array.isArray(dbSheet)) {
-        alert("파일에 유효한 시트 또는 데이터가 없습니다.");
-        return;
-      }
-
-      let dbBody = dbSheet.slice(1).filter(r => r.H?.trim() === selectedGov);
+      let dbBody = dbSheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       if (excludePrivate) {
-        dbBody = dbBody.filter(r => !privateList.includes(r.I?.trim()));
+        dbBody = dbBody.filter(r => !privateList.includes(r["관리주체"]?.trim()));
       }
 
       const groupCols = ["C", "D", "E", "F", "G"];
@@ -235,26 +254,29 @@ export function FullAutomationApp() {
       const gradeKeys = new Set();
 
       for (let i = 2; i < 200; i++) {
-        const infra = sheet[A${i}]?.v?.trim();
-        const fac = sheet[B${i}]?.v?.trim();
+        const infra = sheet[`A${i}`]?.v?.trim();
+        const fac = sheet[`B${i}`]?.v?.trim();
         if (!infra || !fac) continue;
+
         for (let col of groupCols) {
-          const v = sheet[${col}${i}]?.v?.trim();
-          const label = sheet[${col}1]?.v?.trim();
-          if (v === "O") groupKeys.add(${infra}||${fac}||${label});
+          const v = sheet[`${col}${i}`]?.v?.trim();
+          const label = sheet[`${col}1`]?.v?.trim();
+          if (v === "O") groupKeys.add(`${infra}||${fac}||${label}`);
         }
+
         for (let col of gradeCols) {
-          const v = sheet[${col}${i}]?.v?.trim();
-          const label = sheet[${col}1]?.v?.trim();
-          if (v === "O") gradeKeys.add(${infra}||${fac}||${label});
+          const v = sheet[`${col}${i}`]?.v?.trim();
+          const label = sheet[`${col}1`]?.v?.trim();
+          if (v === "O") gradeKeys.add(`${infra}||${fac}||${label}`);
         }
       }
 
-      const included = dbBody.filter(r => groupKeys.has(${r.D?.trim()}||${r.F?.trim()}||${r.C?.trim()}));
-      const excluded = dbBody.filter(r => !groupKeys.has(${r.D?.trim()}||${r.F?.trim()}||${r.C?.trim()}));
-      const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r.M?.trim()));
-      const passed = validGrades.filter(r => gradeKeys.has(${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}));
-      const failed = validGrades.filter(r => !gradeKeys.has(${r.D?.trim()}||${r.F?.trim()}||${r.M?.trim()}));
+      const included = dbBody.filter(r => groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
+      const excluded = dbBody.filter(r => !groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
+      const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
+      const passed = validGrades.filter(r => gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
+      const failed = validGrades.filter(r => !gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
+
       const raw = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
 
       setGroupIncluded(included);
@@ -274,27 +296,22 @@ export function FullAutomationApp() {
       setIsLoadingMaintain(false);
     }
   };
-
+// App.jsx (6/6)
   const handleOrdinanceScore = async () => {
     if (!ordinanceFile || !selectedGov) {
-      alert("지자체 선택 및 파일 업로드가 필요합니다.");
+      alert("지자체 선택 및 조례 파일 업로드가 필요합니다.");
       return;
     }
 
     setIsLoadingOrdinance(true);
     try {
-      const wb = await readJson(ordinanceFile);
+      const wb = await readJson(ordinanceFile, "ordinance");
       const sheetName = Object.keys(wb)[0];
       const sheet = wb[sheetName];
 
-      if (!sheet || !Array.isArray(sheet)) {
-        alert("파일에 유효한 시트 또는 데이터가 없습니다.");
-        return;
-      }
-
-      const filtered = sheet.filter(r => r.B?.trim() === selectedGov);
+      const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       const total = filtered.length;
-      const done = filtered.filter(r => r.E?.toString().trim() === "O");
+      const done = filtered.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
 
       setOrdinanceDenominator(total);
       setOrdinanceNumerator(done.length);
@@ -308,7 +325,7 @@ export function FullAutomationApp() {
       setIsLoadingOrdinance(false);
     }
   };
-  
+
   return (
     <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
