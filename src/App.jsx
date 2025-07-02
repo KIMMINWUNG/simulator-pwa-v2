@@ -48,6 +48,10 @@ export default function App() {
   const [authorized, setAuthorized] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 const [isAdmin, setIsAdmin] = useState(false);
+const [planFile, setPlanFile] = useState(null);
+  const [dbFile, setDbFile] = useState(null);
+  const [noticeFile, setNoticeFile] = useState(null);
+  const [ordinanceFile, setOrdinanceFile] = useState(null);
   if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
 if (isAdmin) return (
   <AdminAutomationApp
@@ -58,18 +62,27 @@ if (isAdmin) return (
     ordinanceFile={ordinanceFile}
   />
 );
-return <FullAutomationApp openAdmin={() => setShowAdminLogin(true)} />;
+return (
+  <FullAutomationApp
+    openAdmin={() => setShowAdminLogin(true)}
+    planFile={planFile} setPlanFile={setPlanFile}
+    dbFile={dbFile} setDbFile={setDbFile}
+    noticeFile={noticeFile} setNoticeFile={setNoticeFile}
+    ordinanceFile={ordinanceFile} setOrdinanceFile={setOrdinanceFile}
+  />
+);
 }
 
-export function FullAutomationApp({ openAdmin }) {
+export function FullAutomationApp({
+  openAdmin,
+  planFile, setPlanFile,
+  dbFile, setDbFile,
+  noticeFile, setNoticeFile,
+  ordinanceFile, setOrdinanceFile
+}) {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
-
-  const [noticeFile, setNoticeFile] = useState(null);
-  const [dbFile, setDbFile] = useState(null);
-  const [planFile, setPlanFile] = useState(null);
-  const [ordinanceFile, setOrdinanceFile] = useState(null);
 
   const [planScore, setPlanScore] = useState(null);
   const [planRate, setPlanRate] = useState(null);
