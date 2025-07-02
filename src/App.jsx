@@ -3,29 +3,17 @@ import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
+import AdminLoginModal from "./components/AdminLoginModal";
+import AdminAutomationApp from "./components/AdminAutomationApp"
+import {
+  LOCAL_GOV_LIST, GRADE_EXCLUDE,
+  HEADER_PLAN, HEADER_DB, HEADER_ORDINANCE, HEADER_NOTICE
+} from "./utils/constants";
 
-const HEADER_PLAN = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
-];
-const HEADER_DB = [
-  '관리번호', '기반시설물명', '시설물종별', '기반시설구분', '시설물구분', '시설물종류',
-  '관리감독기관', '관리계획 수립기관', '관리주체', '관리주체 하위조직', '기관상세', '준공일', '등급'
-];
-const HEADER_ORDINANCE = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정 여부'
-];
-const HEADER_NOTICE = [
-  '시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타',
-  '비대상', 'A', 'B', 'C', 'D', 'E', '우수', '양호', '보통', '미흡', '불량'
-];
+import {
+  readJson, readRaw, validateHeader, downloadExcel
+} from "./utils/fileUtils";
 
-const LOCAL_GOV_LIST = [
-  "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
-  "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원특별자치도",
-  "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
-];
-
-const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음", "기타"];
 const MASTER_KEY = "k.infra";
 
 function LoginComponent({ onSuccess }) {
@@ -58,17 +46,22 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+const [isAdmin, setIsAdmin] = useState(false);
+  if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
+if (isAdmin) return (
+  <AdminAutomationApp
+    onBack={() => setIsAdmin(false)}
+    planFile={planFile}
+    dbFile={dbFile}
+    noticeFile={noticeFile}
+    ordinanceFile={ordinanceFile}
+  />
+);
+return <FullAutomationApp openAdmin={() => setShowAdminLogin(true)} />;
 }
 
-// ✅ 수정된 validateHeader 함수
-const validateHeader = (actualHeader, expectedHeader) => {
-  if (!actualHeader || !Array.isArray(actualHeader)) return false;
-  if (actualHeader.length !== expectedHeader.length) return false;
-  return expectedHeader.every((v, i) => v === actualHeader[i]);
-};
-// App.jsx (2/6)
-export function FullAutomationApp() {
+export function FullAutomationApp({ openAdmin }) {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
@@ -132,62 +125,7 @@ export function FullAutomationApp() {
     setOrdinanceNumerator(0);
     setOrdinanceDenominator(0);
   }, [selectedGov]);
-// App.jsx (3/6)
-  const readJson = (file, type) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-        const json = {};
-        const expectedHeaders = {
-          plan: HEADER_PLAN,
-          db: HEADER_DB,
-          ordinance: HEADER_ORDINANCE
-        };
-        const headerType = expectedHeaders[type];
 
-        wb.SheetNames.forEach(name => {
-          const data = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1 });
-          const sheetHeader = data[0];
-          if (!validateHeader(sheetHeader, headerType)) {
-            alert(`❗ ${name} 시트의 헤더 형식이 올바르지 않습니다.\n필수 형식: ${headerType.join(", ")}`);
-            throw new Error("Invalid header");
-          }
-          const rows = data.slice(1).map(row =>
-            Object.fromEntries(sheetHeader.map((key, i) => [key, row[i]]))
-          );
-          json[name] = rows;
-        });
-        resolve(json);
-      } catch (err) {
-        reject(err);
-      }
-    };
-    reader.onerror = () => reject("파일을 읽을 수 없습니다.");
-    reader.readAsArrayBuffer(file);
-  });
-
-  const readRaw = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-        resolve(wb);
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = () => reject("파일을 읽을 수 없습니다.");
-    reader.readAsArrayBuffer(file);
-  });
-
-  const downloadExcel = (data, filename) => {
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, filename);
-  };
-// App.jsx (4/6)
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -343,6 +281,13 @@ const failed = validGrades.filter(r =>
   return (
     <>
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', padding: '12px 24px' }}>
+  <button onClick={openAdmin} style={{
+    backgroundColor: '#eee', border: '1px solid #ccc', padding: '6px 12px', borderRadius: '6px'
+  }}>
+    🔐 관리자모드
+  </button>
+</div>
       <div className="simulator" style={{ padding: '24px', width: '70vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
@@ -531,6 +476,15 @@ const failed = validGrades.filter(r =>
           ⓒ 2025 Kim Min Wung. All rights reserved.
         </div>
       </footer>
+      {showAdminLogin && (
+  <AdminLoginModal
+    onSuccess={() => {
+      setIsAdmin(true);
+      setShowAdminLogin(false);
+    }}
+    onClose={() => setShowAdminLogin(false)}
+  />
+)}
     </div>
   </>
 );
