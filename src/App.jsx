@@ -12,7 +12,7 @@ const HEADER_DB = [
   '관리감독기관', '관리계획 수립기관', '관리주체', '관리주체 하위조직', '기관상세', '준공일', '등급'
 ];
 const HEADER_ORDINANCE = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정 여부'
 ];
 const HEADER_NOTICE = [
   '시설종류', '시설물종류', '시설물안전법 1종', '시설물안전법 2종', '시설물안전법 3종', '시설물안전법 기타',
@@ -204,7 +204,7 @@ export function FullAutomationApp() {
       const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r["작성기관"]?.trim())) : filtered;
 
       const done = finalData.filter(r => {
-        const date = new Date(r["제출일시"]);
+        const date = new Date(r["결재이력"]);
         return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
       });
 
@@ -271,11 +271,25 @@ export function FullAutomationApp() {
         }
       }
 
-      const included = dbBody.filter(r => groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
-      const excluded = dbBody.filter(r => !groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
-      const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
-      const passed = validGrades.filter(r => gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
-      const failed = validGrades.filter(r => !gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
+      const included = dbBody.filter(r =>
+  groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`)
+);
+
+const excluded = dbBody.filter(r =>
+  !groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`)
+);
+
+const validGrades = included.filter(r =>
+  !GRADE_EXCLUDE.includes(r["등급"]?.trim())
+);
+
+const passed = validGrades.filter(r =>
+  gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`)
+);
+
+const failed = validGrades.filter(r =>
+  !gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`)
+);
 
       const raw = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
 
@@ -311,7 +325,7 @@ export function FullAutomationApp() {
 
       const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       const total = filtered.length;
-      const done = filtered.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
+      const done = filtered.filter(r => r["충당금 조례 제정 여부"]?.toString().trim() === "O");
 
       setOrdinanceDenominator(total);
       setOrdinanceNumerator(done.length);
