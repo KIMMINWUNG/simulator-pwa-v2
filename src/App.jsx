@@ -25,7 +25,7 @@ const LOCAL_GOV_LIST = [
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
 ];
 
-const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
+const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음", "기타"];
 const MASTER_KEY = "k.infra";
 
 function LoginComponent({ onSuccess }) {
