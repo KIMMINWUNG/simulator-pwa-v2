@@ -5,6 +5,7 @@ import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
 import AdminLoginModal from "./components/AdminLoginModal";
 import AdminPage from "./components/AdminPage";
+import FullAutomationApp from "./components/FullAutomationApp";
 
 const HEADER_PLAN = [
   '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
@@ -60,22 +61,21 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false); // ✅ 추가
-  const [isAdminMode, setIsAdminMode] = useState(false);       // ✅ 추가
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
-  if (isAdminMode) return <AdminPage />; // (다음 단계에서 만들 파일입니다)
-
+  if (isAdminMode) return <AdminPage />;
   return <FullAutomationApp />;
 }
+// App.jsx (2/6)
 
-// ✅ 수정된 validateHeader 함수
-const validateHeader = (actualHeader, expectedHeader) => {
+export function validateHeader(actualHeader, expectedHeader) {
   if (!actualHeader || !Array.isArray(actualHeader)) return false;
   if (actualHeader.length !== expectedHeader.length) return false;
   return expectedHeader.every((v, i) => v === actualHeader[i]);
-};
-// App.jsx (2/6)
+}
+
 export function FullAutomationApp() {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
@@ -117,7 +117,6 @@ export function FullAutomationApp() {
   }, []);
 
   useEffect(() => {
-    // 지자체 선택 시 모든 상태 초기화
     setPlanScore(null);
     setPlanRate(null);
     setPlanTotal(0);
@@ -141,6 +140,7 @@ export function FullAutomationApp() {
     setOrdinanceDenominator(0);
   }, [selectedGov]);
 // App.jsx (3/6)
+
   const readJson = (file, type) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -196,6 +196,7 @@ export function FullAutomationApp() {
     XLSX.writeFile(wb, filename);
   };
 // App.jsx (4/6)
+
   const handlePlanScore = async () => {
     if (!planFile || !selectedGov) {
       alert("지자체 선택 및 실행계획 파일 업로드가 필요합니다.");
@@ -232,6 +233,7 @@ export function FullAutomationApp() {
     }
   };
 // App.jsx (5/6)
+
   const handleMaintainScore = async () => {
     if (!selectedGov || !noticeFile || !dbFile) {
       alert("지자체 선택, 고시문 파일 및 실적DB 파일 업로드가 필요합니다.");
@@ -279,11 +281,11 @@ export function FullAutomationApp() {
         }
       }
 
-      const included = dbBody.filter(r => groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
-      const excluded = dbBody.filter(r => !groupKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["관리그룹"]}`));
+      const included = dbBody.filter(r => groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
+      const excluded = dbBody.filter(r => !groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
       const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
-      const passed = validGrades.filter(r => gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
-      const failed = validGrades.filter(r => !gradeKeys.has(`${r["시설유형"]}||${r["시설명"]}||${r["등급"]}`));
+      const passed = validGrades.filter(r => gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
+      const failed = validGrades.filter(r => !gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
 
       const raw = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
 
@@ -304,7 +306,6 @@ export function FullAutomationApp() {
       setIsLoadingMaintain(false);
     }
   };
-// App.jsx (6/6)
   const handleOrdinanceScore = async () => {
     if (!ordinanceFile || !selectedGov) {
       alert("지자체 선택 및 조례 파일 업로드가 필요합니다.");
@@ -336,24 +337,24 @@ export function FullAutomationApp() {
 
   return (
     <>
-    <div style={{ position: "absolute", top: 20, right: 20 }}>
-  <button
-    onClick={() => setShowAdminLogin(true)}
-    style={{
-      padding: "8px 16px",
-      borderRadius: "6px",
-      backgroundColor: "#1e88e5",
-      color: "#fff",
-      border: "none",
-      fontWeight: "bold",
-      cursor: "pointer"
-    }}
-  >
-    🔑 관리자 모드
-  </button>
-</div>
+      <div style={{ position: "absolute", top: 20, right: 20 }}>
+        <button
+          onClick={() => setShowAdminLogin(true)}
+          style={{
+            padding: "8px 16px",
+            borderRadius: "6px",
+            backgroundColor: "#1e88e5",
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            cursor: "pointer"
+          }}
+        >
+          🔑 관리자 모드
+        </button>
+      </div>
 
-    <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '70vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
 
         <div style={{ backgroundColor: '#fef3c7', padding: '12px 20px', border: '1px solid #facc15', color: '#78350f', marginBottom: '20px', borderRadius: '6px', fontSize: '14px' }}>
@@ -516,44 +517,45 @@ export function FullAutomationApp() {
     </div>
     
     {/* Footer */}
-    <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
-      <footer style={{
-        width: '90vw',
-        maxWidth: '1500px',
-        backgroundColor: '#f0f4f8',
-        padding: '16px 20px',
-        marginTop: '40px',
-        fontSize: '13px',
-        color: '#444',
-        borderTop: '1px solid #ccc',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
-          <div>
-            <strong>국토안전관리원 기반시설관리실</strong><br />
-            담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리실
+      <div style={{ width: '100vw', display: 'flex', justifyContent: 'center' }}>
+        <footer style={{
+          width: '90vw',
+          maxWidth: '1500px',
+          backgroundColor: '#f0f4f8',
+          padding: '16px 20px',
+          marginTop: '40px',
+          fontSize: '13px',
+          color: '#444',
+          borderTop: '1px solid #ccc',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="/ci_logo.png" alt="국토안전관리원 CI" style={{ height: '32px' }} />
+            <div>
+              <strong>국토안전관리원 기반시설관리실</strong><br />
+              담당자: 김민웅 &nbsp;|&nbsp; 연락처: 055-771-8497 &nbsp;|&nbsp; 주소: 경상남도 진주시 사들로 123번길 40, 7층 배종프라임 기반시설관리실
+            </div>
           </div>
-        </div>
-        <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
-          ⓒ 2025 Kim Min Wung. All rights reserved.
-        </div>
-      </footer>
-    </div>
-    {/* ✅ 관리자 로그인 모달 조건부 렌더링 */}
-{showAdminLogin && (
-  <AdminLoginModal
-    onSuccess={() => {
-      setAuthorized(true);     // ✅ 이거 없으면 화면 진입 안 됨!
-      setIsAdminMode(true);
-      setShowAdminLogin(false);
-    }}
-    onCancel={() => setShowAdminLogin(false)}
-  />
-)}
-  </>
-);
+          <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+            ⓒ 2025 Kim Min Wung. All rights reserved.
+          </div>
+        </footer>
+      </div>
+
+      {/* ✅ 관리자 로그인 모달 조건부 렌더링 */}
+      {showAdminLogin && (
+        <AdminLoginModal
+          onSuccess={() => {
+            setAuthorized(true);     // ✅ 이거 없으면 화면 진입 안 됨!
+            setIsAdminMode(true);
+            setShowAdminLogin(false);
+          }}
+          onCancel={() => setShowAdminLogin(false)}
+        />
+      )}
+    </>
+  );
 }
