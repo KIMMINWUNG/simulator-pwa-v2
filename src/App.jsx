@@ -2,17 +2,17 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
-import { PRIVATE_OWNERS } from "./privateList";
-import AdminLoginModal from "./components/AdminLoginModal";
-import AdminAutomationApp from "./components/AdminAutomationApp"
+import { PRIVATE_OWNERS } from "./privateList.js";
+import AdminLoginModal from "./components/AdminLoginModal.jsx";
+import AdminAutomationApp from "./components/AdminAutomationApp.jsx";
 import {
   LOCAL_GOV_LIST, GRADE_EXCLUDE,
   HEADER_PLAN, HEADER_DB, HEADER_ORDINANCE, HEADER_NOTICE
-} from "./utils/constants";
+} from "./utils/constants.js";
 
 import {
   readJson, readRaw, validateHeader, downloadExcel
-} from "./utils/fileutils";
+} from "./utils/fileUtils.js";
 
 const MASTER_KEY = "k.infra";
 

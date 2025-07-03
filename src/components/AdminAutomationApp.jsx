@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import { LOCAL_GOV_LIST } from "../../utils/constants";
-import { readJson, readRaw, downloadExcel } from "../../utils/fileUtils";
-
+import { LOCAL_GOV_LIST } from "../utils/constants";
+import { readJson, readRaw, downloadExcel } from "../utils/fileUtils";
 export default function AdminAutomationApp({ onBack, planFile, dbFile, noticeFile, ordinanceFile }) {
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
