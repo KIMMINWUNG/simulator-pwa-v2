@@ -547,9 +547,9 @@ export function FullAutomationApp() {
 {showAdminLogin && (
   <AdminLoginModal
     onSuccess={() => {
+      setAuthorized(true);     // ✅ 이거 없으면 화면 진입 안 됨!
       setIsAdminMode(true);
       setShowAdminLogin(false);
-      alert("✅ 관리자 인증 성공!");
     }}
     onCancel={() => setShowAdminLogin(false)}
   />
