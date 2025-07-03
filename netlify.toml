@@ -1,0 +1,6 @@
+[build]
+command = "corepack enable && pnpm install && pnpm run build"
+publish = "dist"
+
+[build.environment]
+NPM_FLAGS = "--include=optional"
