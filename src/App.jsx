@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
+import AdminLoginModal from "./components/AdminLoginModal";
 
 const HEADER_PLAN = [
   '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
@@ -58,7 +59,13 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  return authorized ? <FullAutomationApp /> : <LoginComponent onSuccess={() => setAuthorized(true)} />;
+  const [showAdminLogin, setShowAdminLogin] = useState(false); // ✅ 추가
+  const [isAdminMode, setIsAdminMode] = useState(false);       // ✅ 추가
+
+  if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
+  if (isAdminMode) return <AdminPage />; // (다음 단계에서 만들 파일입니다)
+
+  return <FullAutomationApp />;
 }
 
 // ✅ 수정된 validateHeader 함수
@@ -328,6 +335,23 @@ export function FullAutomationApp() {
 
   return (
     <>
+    <div style={{ position: "absolute", top: 20, right: 20 }}>
+  <button
+    onClick={() => setShowAdminLogin(true)}
+    style={{
+      padding: "8px 16px",
+      borderRadius: "6px",
+      backgroundColor: "#1e88e5",
+      color: "#fff",
+      border: "none",
+      fontWeight: "bold",
+      cursor: "pointer"
+    }}
+  >
+    🔑 관리자 모드
+  </button>
+</div>
+
     <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
       <div className="simulator" style={{ padding: '24px', width: '70vw', maxWidth: '2800px', background: '#eceff1', borderRadius: '12px' }}>
 
@@ -518,6 +542,17 @@ export function FullAutomationApp() {
         </div>
       </footer>
     </div>
+    {/* ✅ 관리자 로그인 모달 조건부 렌더링 */}
+{showAdminLogin && (
+  <AdminLoginModal
+    onSuccess={() => {
+      setIsAdminMode(true);
+      setShowAdminLogin(false);
+      alert("✅ 관리자 인증 성공!");
+    }}
+    onCancel={() => setShowAdminLogin(false)}
+  />
+)}
   </>
 );
 }
