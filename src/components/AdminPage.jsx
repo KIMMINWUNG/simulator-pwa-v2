@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { PRIVATE_OWNERS } from "../privateList";
+import { calculateScoresForGov } from "../utils/scoreUtils"; // ✅ 이거 추가
 
 const LOCAL_GOV_LIST = [
   "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
