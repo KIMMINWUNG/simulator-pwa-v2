@@ -380,13 +380,13 @@ export default function FullAutomationApp({ onActivateAdmin }) {
     }
   };
 // ✅ 이 아래에 바로 붙여주세요!
-const handleDetailedExport = (type) => {
+const handleDetailedExport = (type, filename) => {
   if (!allDetailedData || Object.keys(allDetailedData).length === 0) {
     alert("먼저 점수 일괄 산출을 진행해주세요.");
     return;
   }
 
-  exportDetailedExcel(allDetailedData, type, `${type}_전체지자체_리스트.xlsx`);
+  exportDetailedExcel(allDetailedData, type, filename);
 };
   return (
   <>
@@ -418,11 +418,21 @@ const handleDetailedExport = (type) => {
     onClose={() => setIsAdminMode(false)}
 
     // ✅ 5개 관리자 엑셀 항목 핸들러 추가
-    onExportPlanMissing={() => handleDetailedExport("planMissing")}
-    onExportGroupIncluded={() => handleDetailedExport("groupIncluded")}
-    onExportGroupExcluded={() => handleDetailedExport("groupExcluded")}
-    onExportGradePassed={() => handleDetailedExport("gradePassed")}
-    onExportGradeFailed={() => handleDetailedExport("gradeFailed")}
+    onExportPlanMissing={() =>
+  handleDetailedExport("planMissing", "실행계획_미제출_DB_전체지자체.xlsx")
+}
+onExportGroupIncluded={() =>
+  handleDetailedExport("groupIncluded", "관리그룹_포함_DB_전체지자체.xlsx")
+}
+onExportGroupExcluded={() =>
+  handleDetailedExport("groupExcluded", "관리그룹_제외_DB_전체지자체.xlsx")
+}
+onExportGradePassed={() =>
+  handleDetailedExport("gradePassed", "목표등급_만족_DB_전체지자체.xlsx")
+}
+onExportGradeFailed={() =>
+  handleDetailedExport("gradeFailed", "목표등급_불만족_DB_전체지자체.xlsx")
+}
   />
 )}
 
