@@ -1,7 +1,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResults, onClose }) {
+export default function AdminSummaryPanel({
+  isLoading,
+  onRun,
+  onExport,
+  allResults,
+  onClose,
+  onExportPlanMissing,
+  onExportGroupIncluded,
+  onExportGroupExcluded,
+  onExportGradePassed,
+  onExportGradeFailed
+}) {
   const [showTable, setShowTable] = useState(true);
 
   const buttonStyle = {
