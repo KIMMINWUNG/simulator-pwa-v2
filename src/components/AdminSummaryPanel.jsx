@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResults }) {
+export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResults, onClose }) {
   const [showTable, setShowTable] = useState(true);
 
   const buttonStyle = {
@@ -16,34 +16,67 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
     <div style={{
       marginTop: '40px',
       padding: '24px',
-      background: '#eceff1',
+      background: '#eceff1', // 시뮬레이터 박스 색상과 동일
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      border: '1px solid #ccc', // 테두리 추가
       width: '70vw',
       maxWidth: '2800px',
       marginLeft: 'auto',
       marginRight: 'auto',
       position: 'relative'
     }}>
-      <h3 style={{ fontSize: '20px', marginBottom: '12px' }}>🧮 관리자용 전체 점수</h3>
+      {/* 닫기 버튼 */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'transparent',
+            border: 'none',
+            fontSize: '18px',
+            cursor: 'pointer',
+            color: '#555'
+          }}
+          title="닫기"
+        >
+          ✖
+        </button>
+      )}
 
-      <button
-        onClick={() => setShowTable(prev => !prev)}
-        style={{
-          marginBottom: '16px',
-          backgroundColor: '#78909c',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '6px',
-          padding: '6px 12px',
-          cursor: 'pointer',
-          fontSize: '14px'
-        }}
-      >
-        {showTable ? "▲ 접기" : "▼ 펼치기"}
-      </button>
+      {/* 제목: 지자체 합동평가 스타일과 동일 */}
+      <h3 style={{
+        fontSize: '28px',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#1f2937',
+        marginBottom: '16px'
+      }}>
+        🔐관리자 모드
+      </h3>
 
-      {/* 버튼 영역 */}
+      {/* 토글 버튼: 시뮬레이터 버튼과 통일 */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <button
+          onClick={() => setShowTable(prev => !prev)}
+          style={{
+            backgroundColor: '#0d6efd',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '6px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            marginBottom: '20px'
+          }}
+        >
+          {showTable ? "▲ 접기" : "▼ 펼치기"}
+        </button>
+      </div>
+
+      {/* 실행/엑셀 버튼 */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
         <button
           onClick={onRun}
@@ -69,7 +102,7 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
         </button>
       </div>
 
-      {/* 점수표 (애니메이션 포함) */}
+      {/* 점수표 (슬라이드 애니메이션 포함) */}
       <AnimatePresence initial={false}>
         {showTable && allResults.length > 0 && (
           <motion.div
@@ -80,15 +113,20 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
             transition={{ duration: 0.3 }}
             style={{ overflow: "hidden", marginTop: "20px" }}
           >
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "14px",
+              backgroundColor: "#fff"
+            }}>
               <thead>
-                <tr style={{ backgroundColor: "#cfd8dc", textAlign: "left" }}>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>순위</th>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>지자체</th>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>실행계획</th>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>유지관리기준</th>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>조례제정</th>
-                  <th style={{ padding: "10px", borderBottom: "2px solid #b0bec5" }}>총점</th>
+                <tr style={{ backgroundColor: "#f1f5f9", textAlign: "center" }}>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>순위</th>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>지자체</th>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>실행계획</th>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>유지관리기준</th>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>조례제정</th>
+                  <th style={{ padding: "10px", borderBottom: "2px solid #ccc", borderTop: "1px solid #ccc" }}>총점</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,9 +134,8 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
                   .sort((a, b) => Number(b.총점) - Number(a.총점))
                   .map((row, idx) => (
                     <tr key={idx} style={{
-                      backgroundColor: idx % 2 === 0 ? "#f5f5f5" : "#ffffff",
-                      transition: 'background 0.2s',
-                      cursor: 'default'
+                      backgroundColor: idx % 2 === 0 ? "#f9fafb" : "#ffffff",
+                      textAlign: "center"
                     }}>
                       <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{idx + 1}</td>
                       <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>{row.지자체}</td>
