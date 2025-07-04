@@ -16,7 +16,7 @@ const HEADER_DB = [
 const HEADER_ORDINANCE = [
   '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정 여부'
 ];
-const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
+const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음", "기타"];
 
 const LOCAL_GOV_LIST = [
   "경상남도", "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
