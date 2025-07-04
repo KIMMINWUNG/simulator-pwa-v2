@@ -14,25 +14,7 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
   marginRight: 'auto',
   position: 'relative'
 }}>
-  {/* 닫기 버튼 (오른쪽 상단 X) */}
-<button
-  onClick={onClose}
-  style={{
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    background: 'none',
-    border: 'none',
-    fontSize: '18px',
-    cursor: 'pointer',
-    color: '#888'
-  }}
-  title="닫기"
->
-  ✖
-</button>
-
-      <h3>관리자용 전체 점수 산출</h3>
+      <h3>관리자용 전체 점수</h3>
       <button onClick={onRun} disabled={isLoading} style={{ marginRight: "12px", padding: "10px", backgroundColor: "#1e88e5", color: "#fff", border: "none", borderRadius: "6px" }}>
         {isLoading ? "⏳ 점수 산출 중..." : "점수 일괄 산출"}
       </button>

@@ -23,7 +23,7 @@ const LOCAL_GOV_LIST = [
   "충청북도", "충청남도", "전북특별자치도", "전라남도", "경상북도", "제주특별자치도"
 ];
 
-export default function FullAutomationApp() {
+export default function FullAutomationApp({ onActivateAdmin }) {
   const [selectedGov, setSelectedGov] = useState("");
   const [excludePrivate, setExcludePrivate] = useState(true);
   const [privateList, setPrivateList] = useState([]);
@@ -590,13 +590,14 @@ export default function FullAutomationApp() {
   {/* 관리자 모달 */}
   {showAdminLogin && (
     <AdminLoginModal
-      onSuccess={() => {
-        setAuthorized(true);
-        setIsAdminMode(true);
-        setShowAdminLogin(false);
-      }}
-          onCancel={() => setShowAdminLogin(false)}
-        />
+  onSuccess={() => {
+    if (typeof onActivateAdmin === 'function') onActivateAdmin(); // App 상태 변경
+    setAuthorized(true);
+    setIsAdminMode(true); // 내부 상태 유지
+    setShowAdminLogin(false);
+  }}
+  onCancel={() => setShowAdminLogin(false)}
+/>
       )}
     </>
   );

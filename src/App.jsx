@@ -1,8 +1,10 @@
+// App.jsx
 import React, { useState } from "react";
 import "./App.css";
+import { PRIVATE_OWNERS } from "./privateList";
 import AdminLoginModal from "./components/AdminLoginModal";
 import AdminPage from "./components/AdminPage";
-import FullAutomationApp from "./components/FullAutomationApp";
+import FullAutomationApp from "./components/FullAutomationApp"; // ✅ 외부로 이동시킨 컴포넌트
 
 const MASTER_KEY = "k.infra";
 
@@ -39,45 +41,11 @@ export default function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
 
-  if (!authorized) {
-    return <LoginComponent onSuccess={() => setAuthorized(true)} />;
-  }
-
-  if (isAdminMode) {
-    return <AdminPage />;
-  }
-
+  if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
+  if (isAdminMode) return <AdminPage />;
   return (
-    <>
-      <div style={{ position: "absolute", top: 20, right: 20 }}>
-        <button
-          onClick={() => setShowAdminLogin(true)}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "6px",
-            backgroundColor: "#1e88e5",
-            color: "#fff",
-            border: "none",
-            fontWeight: "bold",
-            cursor: "pointer"
-          }}
-        >
-          🔑 관리자 모드
-        </button>
-      </div>
-
-      <FullAutomationApp />
-
-      {showAdminLogin && (
-        <AdminLoginModal
-          onSuccess={() => {
-            setAuthorized(true);
-            setIsAdminMode(true);
-            setShowAdminLogin(false);
-          }}
-          onCancel={() => setShowAdminLogin(false)}
-        />
-      )}
-    </>
-  );
+  <FullAutomationApp
+    onActivateAdmin={() => setIsAdminMode(true)}
+  />
+);
 }
