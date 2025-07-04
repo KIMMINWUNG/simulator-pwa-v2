@@ -6,7 +6,7 @@ import AdminSummaryPanel from "./AdminSummaryPanel";
 import { exportExcel } from "../utils/exportExcel";
 
 const HEADER_PLAN = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '결재이력', '담당자', '결재현황', '결재이력', '결재-담당자'
 ];
 const HEADER_DB = [
   '관리번호', '기반시설물명', '시설물종별', '기반시설구분', '시설물구분', '시설물종류',
@@ -166,7 +166,7 @@ export default function FullAutomationApp() {
       const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       const finalData = excludePrivate ? filtered.filter(r => !privateList.includes(r["작성기관"]?.trim())) : filtered;
       const done = finalData.filter(r => {
-        const date = new Date(r["제출일시"]);
+        const date = new Date(r["결재이력"]);
         return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
       });
       const missed = finalData.filter(r => !done.includes(r));
@@ -300,7 +300,7 @@ export default function FullAutomationApp() {
       const plan = planWB[Object.keys(planWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
       const planFiltered = excludePrivate ? plan.filter(r => !PRIVATE_OWNERS.includes(r["작성기관"]?.trim())) : plan;
       const planDone = planFiltered.filter(r => {
-        const date = new Date(r["제출일시"]);
+        const date = new Date(r["결재이력"]);
         return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
       });
       const scorePlan = planFiltered.length > 0 ? (planDone.length / planFiltered.length) * 100 * 0.1 : 0;
