@@ -13,7 +13,7 @@ const HEADER_DB = [
   '관리감독기관', '관리계획 수립기관', '관리주체', '관리주체 하위조직', '기관상세', '준공일', '등급'
 ];
 const HEADER_ORDINANCE = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정여부'
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '충당금 조례 제정 여부'
 ];
 const GRADE_EXCLUDE = ["", "실시완료", "실시완료(등급미상)", "해당없음"];
 
@@ -195,7 +195,7 @@ export default function FullAutomationApp() {
       const sheet = wb[Object.keys(wb)[0]];
       const filtered = sheet.filter(r => r["관리계획 수립기관"]?.trim() === selectedGov);
       const total = filtered.length;
-      const done = filtered.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
+      const done = filtered.filter(r => r["충당금 조례 제정 여부"]?.toString().trim() === "O");
       const raw = total > 0 ? (done.length / total) * 100 * 0.2 : 0;
       setOrdinanceDenominator(total);
       setOrdinanceNumerator(done.length);
@@ -342,7 +342,7 @@ export default function FullAutomationApp() {
 
       // 조례제정
       const ordinanceSheet = ordinanceWB[Object.keys(ordinanceWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
-      const ordinanceDone = ordinanceSheet.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
+      const ordinanceDone = ordinanceSheet.filter(r => r["충당금 조례 제정 여부"]?.toString().trim() === "O");
       const scoreOrdinance = ordinanceSheet.length > 0 ? (ordinanceDone.length / ordinanceSheet.length) * 100 * 0.2 : 0;
 
       resultList.push({
@@ -521,7 +521,7 @@ export default function FullAutomationApp() {
               )
             },
             {
-              title: "③ 성능개선 충당금 조례 제정여부",
+              title: "③ 성능개선 충당금 조례 제정 여부",
               content: (
                 <>
                   <label>조례 확인 엑셀 업로드:</label>
