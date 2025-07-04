@@ -6,7 +6,7 @@ import AdminSummaryPanel from "./AdminSummaryPanel";
 import { exportExcel } from "../utils/exportExcel";
 
 const HEADER_PLAN = [
-  '구분', '관리계획 수립기관', '작성기관', '시설종류', '결재이력', '담당자', '결재현황', '결재이력', '결재-담당자'
+  '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
 ];
 const HEADER_DB = [
   '관리번호', '기반시설물명', '시설물종별', '기반시설구분', '시설물구분', '시설물종류',
