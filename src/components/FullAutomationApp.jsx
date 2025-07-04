@@ -366,21 +366,22 @@ export default function FullAutomationApp({ onActivateAdmin }) {
   return (
   <>
     {/* ✅ 기존 UI 시작: 관리자 로그인 버튼 */}
-    <div style={{ position: "absolute", top: 20, right: 20 }}>
-      <button
-        onClick={() => setShowAdminLogin(true)}
-        style={{
-          padding: "8px 16px",
-          borderRadius: "6px",
-          backgroundColor: "#1e88e5",
-          color: "#fff",
-          border: "none",
-          fontWeight: "bold",
-          cursor: "pointer"
-        }}
-      >
-        🔑 관리자 모드
-      </button>
+    <div style={{ position: "absolute", top: 20, left: 20, zIndex: 999 }}>
+  <button
+    onClick={() => setShowAdminLogin(true)}
+    style={{
+      padding: "8px 16px",
+      borderRadius: "6px",
+      backgroundColor: "#6a1b9a", // 보라색 계열 강조
+      color: "#fff",
+      border: "none",
+      fontWeight: "bold",
+      cursor: "pointer",
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)'
+    }}
+  >
+    🔧 관리자용
+  </button>
     </div>
 {/* ✅ 관리자 전용 점수 일괄 계산 UI */}
     {isAdminMode && (
