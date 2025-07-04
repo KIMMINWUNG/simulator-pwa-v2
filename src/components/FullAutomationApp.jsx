@@ -4,6 +4,7 @@ import { PRIVATE_OWNERS } from "../privateList";
 import AdminLoginModal from "./AdminLoginModal";
 import AdminSummaryPanel from "./AdminSummaryPanel";
 import { exportExcel } from "../utils/exportExcel";
+import { exportDetailedExcel } from "../utils/exportDetailedExcel"; // ✅ 추가
 
 const HEADER_PLAN = [
   '구분', '관리계획 수립기관', '작성기관', '시설종류', '제출일시', '담당자', '결재현황', '결재이력', '결재-담당자'
@@ -64,6 +65,7 @@ export default function FullAutomationApp({ onActivateAdmin }) {
   const [authorized, setAuthorized] = useState(false);
 
   const [allResults, setAllResults] = useState([]);
+  const [allDetailedData, setAllDetailedData] = useState({}); // ✅ 추가됨
   const [isBulkLoading, setIsBulkLoading] = useState(false);
 
   useEffect(() => {
@@ -281,88 +283,111 @@ export default function FullAutomationApp({ onActivateAdmin }) {
   };
 
   const calculateAllGovScores = async () => {
-  if (!planFile || !dbFile || !noticeFile || !ordinanceFile) {
-    alert("모든 파일을 업로드해야 합니다.");
-    return;
-  }
+    if (!planFile || !dbFile || !noticeFile || !ordinanceFile) {
+      alert("모든 파일을 업로드해야 합니다.");
+      return;
+    }
 
-  setIsBulkLoading(true);
-  const resultList = [];
+    setIsBulkLoading(true);
+    const resultList = [];
+    const detailedData = {}; // ✅ 각 지자체별 상세 데이터 저장용
 
-  try {
-    const planWB = await readJson(planFile, "plan");
-    const dbWB = await readJson(dbFile, "db");
-    const ordinanceWB = await readJson(ordinanceFile, "ordinance");
-    const noticeWB = await readRaw(noticeFile);
+    try {
+      const planWB = await readJson(planFile, "plan");
+      const dbWB = await readJson(dbFile, "db");
+      const ordinanceWB = await readJson(ordinanceFile, "ordinance");
+      const noticeWB = await readRaw(noticeFile);
 
-    for (const gov of LOCAL_GOV_LIST) {
-      // 실행계획
-      const plan = planWB[Object.keys(planWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
-      const planFiltered = excludePrivate ? plan.filter(r => !PRIVATE_OWNERS.includes(r["작성기관"]?.trim())) : plan;
-      const planDone = planFiltered.filter(r => {
-        const date = new Date(r["결재이력"]);
-        return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
-      });
-      const scorePlan = planFiltered.length > 0 ? (planDone.length / planFiltered.length) * 100 * 0.1 : 0;
+      for (const gov of LOCAL_GOV_LIST) {
+        // ✅ 실행계획
+        const plan = planWB[Object.keys(planWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+        const planFiltered = excludePrivate ? plan.filter(r => !PRIVATE_OWNERS.includes(r["작성기관"]?.trim())) : plan;
+        const planDone = planFiltered.filter(r => {
+          const date = new Date(r["결재이력"]);
+          return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
+        });
+        const planMissed = planFiltered.filter(r => !planDone.includes(r));
+        const scorePlan = planFiltered.length > 0 ? (planDone.length / planFiltered.length) * 100 * 0.1 : 0;
 
-      // 유지관리기준
-      const dbSheet = dbWB[Object.keys(dbWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
-      const dbFiltered = excludePrivate ? dbSheet.filter(r => !PRIVATE_OWNERS.includes(r["관리주체"]?.trim())) : dbSheet;
+        // ✅ 유지관리기준
+        const dbSheet = dbWB[Object.keys(dbWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+        const dbFiltered = excludePrivate ? dbSheet.filter(r => !PRIVATE_OWNERS.includes(r["관리주체"]?.trim())) : dbSheet;
 
-      const sheet = noticeWB.Sheets[gov];
-      const groupKeys = new Set(), gradeKeys = new Set();
+        const sheet = noticeWB.Sheets[gov];
+        const groupKeys = new Set(), gradeKeys = new Set();
 
-      if (sheet) {
-        const groupCols = ["C", "D", "E", "F", "G"];
-        const gradeCols = ["H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"];
-        for (let i = 2; i < 200; i++) {
-          const infra = sheet[`A${i}`]?.v?.trim();
-          const fac = sheet[`B${i}`]?.v?.trim();
-          if (!infra || !fac) continue;
+        if (sheet) {
+          const groupCols = ["C", "D", "E", "F", "G"];
+          const gradeCols = ["H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"];
+          for (let i = 2; i < 200; i++) {
+            const infra = sheet[`A${i}`]?.v?.trim();
+            const fac = sheet[`B${i}`]?.v?.trim();
+            if (!infra || !fac) continue;
 
-          for (let col of groupCols) {
-            if (sheet[`${col}${i}`]?.v === "O") {
-              const label = sheet[`${col}1`]?.v?.trim();
-              groupKeys.add(`${infra}||${fac}||${label}`);
+            for (let col of groupCols) {
+              if (sheet[`${col}${i}`]?.v === "O") {
+                const label = sheet[`${col}1`]?.v?.trim();
+                groupKeys.add(`${infra}||${fac}||${label}`);
+              }
             }
-          }
-          for (let col of gradeCols) {
-            if (sheet[`${col}${i}`]?.v === "O") {
-              const label = sheet[`${col}1`]?.v?.trim();
-              gradeKeys.add(`${infra}||${fac}||${label}`);
+            for (let col of gradeCols) {
+              if (sheet[`${col}${i}`]?.v === "O") {
+                const label = sheet[`${col}1`]?.v?.trim();
+                gradeKeys.add(`${infra}||${fac}||${label}`);
+              }
             }
           }
         }
+
+        const included = dbFiltered.filter(r => groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
+        const excluded = dbFiltered.filter(r => !groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
+        const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
+        const passed = validGrades.filter(r => gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
+        const failed = validGrades.filter(r => !gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
+        const scoreMaintain = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
+
+        // ✅ 조례제정
+        const ordinanceSheet = ordinanceWB[Object.keys(ordinanceWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+        const ordinanceDone = ordinanceSheet.filter(r => r["충당금 조례 제정 여부"]?.toString().trim() === "O");
+        const scoreOrdinance = ordinanceSheet.length > 0 ? (ordinanceDone.length / ordinanceSheet.length) * 100 * 0.2 : 0;
+
+        // ✅ 점수 결과 리스트
+        resultList.push({
+          지자체: gov,
+          실행계획: scorePlan.toFixed(2),
+          유지관리기준: scoreMaintain.toFixed(2),
+          조례제정: scoreOrdinance.toFixed(2),
+          총점: (scorePlan + scoreMaintain + scoreOrdinance).toFixed(2)
+        });
+
+        // ✅ 관리자 엑셀 다운로드용 상세 데이터 저장
+        detailedData[gov] = {
+          planMissing: planMissed,
+          groupIncluded: included,
+          groupExcluded: excluded,
+          gradePassed: passed,
+          gradeFailed: failed
+        };
       }
 
-      const included = dbFiltered.filter(r => groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
-      const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
-      const passed = validGrades.filter(r => gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
-      const scoreMaintain = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
-
-      // 조례제정
-      const ordinanceSheet = ordinanceWB[Object.keys(ordinanceWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
-      const ordinanceDone = ordinanceSheet.filter(r => r["충당금 조례 제정 여부"]?.toString().trim() === "O");
-      const scoreOrdinance = ordinanceSheet.length > 0 ? (ordinanceDone.length / ordinanceSheet.length) * 100 * 0.2 : 0;
-
-      resultList.push({
-        지자체: gov,
-        실행계획: scorePlan.toFixed(2),
-        유지관리기준: scoreMaintain.toFixed(2),
-        조례제정: scoreOrdinance.toFixed(2),
-        총점: (scorePlan + scoreMaintain + scoreOrdinance).toFixed(2)
-      });
+      setAllResults(resultList);
+      setAllDetailedData(detailedData); // ✅ 저장
+    } catch (err) {
+      alert("전체 점수 산출 중 오류가 발생했습니다.");
+      console.error(err);
+    } finally {
+      setIsBulkLoading(false);
     }
-
-    setAllResults(resultList);
-  } catch (err) {
-    alert("전체 점수 산출 중 오류가 발생했습니다.");
-    console.error(err);
-  } finally {
-    setIsBulkLoading(false);
+  };
+// ✅ 이 아래에 바로 붙여주세요!
+const handleDetailedExport = (type) => {
+  if (!allDetailedData || Object.keys(allDetailedData).length === 0) {
+    alert("먼저 점수 일괄 산출을 진행해주세요.");
+    return;
   }
-};
 
+  exportDetailedExcel(allDetailedData, type, `${type}_전체지자체_리스트.xlsx`);
+};
   return (
   <>
     {/* ✅ 기존 UI 시작: 관리자 로그인 버튼 */}
@@ -384,15 +409,22 @@ export default function FullAutomationApp({ onActivateAdmin }) {
   </button>
     </div>
 {/* ✅ 관리자 전용 점수 일괄 계산 UI */}
-    {isAdminMode && (
-      <AdminSummaryPanel
-        isLoading={isBulkLoading}
-        onRun={calculateAllGovScores}
-        onExport={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
-        allResults={allResults}
-  onClose={() => setIsAdminMode(false)} // ⬅ 추가!
-/>
-    )}
+   {isAdminMode && (
+  <AdminSummaryPanel
+    isLoading={isBulkLoading}
+    onRun={calculateAllGovScores}
+    onExport={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
+    allResults={allResults}
+    onClose={() => setIsAdminMode(false)}
+
+    // ✅ 5개 관리자 엑셀 항목 핸들러 추가
+    onExportPlanMissing={() => handleDetailedExport("planMissing")}
+    onExportGroupIncluded={() => handleDetailedExport("groupIncluded")}
+    onExportGroupExcluded={() => handleDetailedExport("groupExcluded")}
+    onExportGradePassed={() => handleDetailedExport("gradePassed")}
+    onExportGradeFailed={() => handleDetailedExport("gradeFailed")}
+  />
+)}
 
   {/* ✅ 점수산정 전체 UI */}
   <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
