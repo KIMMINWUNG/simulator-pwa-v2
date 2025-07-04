@@ -17,7 +17,7 @@ export function exportDetailedExcel(allDetailedData, type, filename) {
     if (!sheetData || sheetData.length === 0) return;
 
     const ws = XLSX.utils.json_to_sheet(sheetData);
-    const label = `${gov}`;
+    const label = `${gov} - ${LABEL_MAP[type] || type}`;
     XLSX.utils.book_append_sheet(wb, ws, label);
   });
 
