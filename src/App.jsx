@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import "./App.css";
 import { PRIVATE_OWNERS } from "./privateList";
 import AdminLoginModal from "./components/AdminLoginModal";
-import AdminPage from "./components/AdminPage";
 import FullAutomationApp from "./components/FullAutomationApp"; // ✅ 외부로 이동시킨 컴포넌트
 
 const MASTER_KEY = "k.infra";
@@ -38,12 +37,11 @@ function LoginComponent({ onSuccess }) {
 
 export default function App() {
   const [authorized, setAuthorized] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false); // 유지 가능
 
   if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
-  if (isAdminMode) return (<FullAutomationApp
-    onActivateAdmin={() => setIsAdminMode(true)}
-  />
-);
+
+  return (
+    <FullAutomationApp onActivateAdmin={() => setIsAdminMode(true)} />
+  );
 }
