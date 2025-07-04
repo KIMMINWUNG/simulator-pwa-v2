@@ -67,28 +67,8 @@ export default function AdminSummaryPanel({
         🔐관리자 모드(총괄 점수 확인)
       </h3>
 
-      {/* 토글 버튼: 시뮬레이터 버튼과 통일 */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <button
-          onClick={() => setShowTable(prev => !prev)}
-          style={{
-            backgroundColor: '#0d6efd',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-            marginBottom: '20px'
-          }}
-        >
-          {showTable ? "▲ 접기" : "▼ 펼치기"}
-        </button>
-      </div>
-
-      {/* 실행/엑셀 버튼 */}
-<div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
+     {/* 실행/엑셀/접기 버튼 한 줄에 정렬 */}
+<div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
   <button
     onClick={onRun}
     disabled={isLoading}
@@ -118,6 +98,20 @@ export default function AdminSummaryPanel({
     }}
   >
     엑셀 다운로드
+  </button>
+  <button
+    onClick={() => setShowTable(prev => !prev)}
+    style={{
+      padding: '10px 20px',
+      fontWeight: 'bold',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      backgroundColor: '#6c757d',
+      color: '#fff'
+    }}
+  >
+    {showTable ? "▲ 접기" : "▼ 펼치기"}
   </button>
 </div>
 
