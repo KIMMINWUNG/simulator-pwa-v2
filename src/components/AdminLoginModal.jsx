@@ -35,10 +35,14 @@ export default function AdminLoginModal({ onSuccess, onCancel }) {
           value={inputKey}
           onChange={e => setInputKey(e.target.value)}
           style={{
-            width: '100%', padding: '10px', borderRadius: '6px',
-            border: '1px solid #ccc', marginBottom: '16px'
-          }}
-        />
+    padding: '10px',
+    width: '100%',           // ✅ 이거 유지
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    marginBottom: '16px',
+    boxSizing: 'border-box'
+  }}
+/>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
           <button
             onClick={onCancel}

@@ -389,7 +389,8 @@ export default function FullAutomationApp() {
         onRun={calculateAllGovScores}
         onExport={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
         allResults={allResults}
-      />
+  onClose={() => setIsAdminMode(false)} // ⬅ 추가!
+/>
     )}
 
   {/* ✅ 점수산정 전체 UI */}

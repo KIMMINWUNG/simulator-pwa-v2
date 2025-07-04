@@ -2,7 +2,18 @@ import React from "react";
 
 export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResults }) {
   return (
-    <div style={{ margin: "20px 0", padding: "16px", background: "#fff", border: "1px solid #ccc", borderRadius: "8px" }}>
+    <div style={{
+  marginTop: '40px',
+  padding: '24px',
+  background: '#ffffff',
+  borderRadius: '12px',
+  boxShadow: '0 4px 12px rgba(236, 223, 36, 0.14)',
+  width: '70vw', // 시뮬레이터 박스와 동일
+  maxWidth: '2800px',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  position: 'relative'
+}}>
       <h3>📊 전체 지자체 일괄 점수 산출</h3>
       <button onClick={onRun} disabled={isLoading} style={{ marginRight: "12px", padding: "10px", backgroundColor: "#1e88e5", color: "#fff", border: "none", borderRadius: "6px" }}>
         {isLoading ? "⏳ 계산 중..." : "점수 일괄 산출"}
