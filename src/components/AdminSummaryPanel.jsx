@@ -53,7 +53,7 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
         color: '#1f2937',
         marginBottom: '16px'
       }}>
-        🔐관리자 모드
+        🔐관리자 모드（지표 점수 일괄 산출）
       </h3>
 
       {/* 토글 버튼: 시뮬레이터 버튼과 통일 */}
@@ -78,6 +78,21 @@ export default function AdminSummaryPanel({ isLoading, onRun, onExport, allResul
 
       {/* 실행/엑셀 버튼 */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
+        {allResults.length > 0 && (
+  <div style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '10px',
+    marginBottom: '20px'
+  }}>
+    <button onClick={onExportPlanMissing}>미제출 DB</button>
+    <button onClick={onExportGroupIncluded}>관리그룹 포함 DB</button>
+    <button onClick={onExportGroupExcluded}>관리그룹 제외 DB</button>
+    <button onClick={onExportGradePassed}>목표등급 만족 DB</button>
+    <button onClick={onExportGradeFailed}>목표등급 불만족 DB</button>
+  </div>
+)}
         <button
           onClick={onRun}
           disabled={isLoading}
