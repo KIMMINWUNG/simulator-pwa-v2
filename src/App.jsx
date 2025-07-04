@@ -42,9 +42,7 @@ export default function App() {
   const [isAdminMode, setIsAdminMode] = useState(false);
 
   if (!authorized) return <LoginComponent onSuccess={() => setAuthorized(true)} />;
-  if (isAdminMode) return <AdminPage />;
-  return (
-  <FullAutomationApp
+  if (isAdminMode) return (<FullAutomationApp
     onActivateAdmin={() => setIsAdminMode(true)}
   />
 );
