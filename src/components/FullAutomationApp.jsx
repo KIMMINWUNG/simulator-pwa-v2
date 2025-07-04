@@ -61,6 +61,9 @@ export default function FullAutomationApp() {
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [authorized, setAuthorized] = useState(false);
 
+  const [allResults, setAllResults] = useState([]);
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+
   useEffect(() => {
     setPrivateList(PRIVATE_OWNERS);
   }, []);
@@ -275,6 +278,89 @@ export default function FullAutomationApp() {
     }
   };
 
+  const calculateAllGovScores = async () => {
+  if (!planFile || !dbFile || !noticeFile || !ordinanceFile) {
+    alert("모든 파일을 업로드해야 합니다.");
+    return;
+  }
+
+  setIsBulkLoading(true);
+  const resultList = [];
+
+  try {
+    const planWB = await readJson(planFile, "plan");
+    const dbWB = await readJson(dbFile, "db");
+    const ordinanceWB = await readJson(ordinanceFile, "ordinance");
+    const noticeWB = await readRaw(noticeFile);
+
+    for (const gov of LOCAL_GOV_LIST) {
+      // 실행계획
+      const plan = planWB[Object.keys(planWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+      const planFiltered = excludePrivate ? plan.filter(r => !PRIVATE_OWNERS.includes(r["작성기관"]?.trim())) : plan;
+      const planDone = planFiltered.filter(r => {
+        const date = new Date(r["제출일시"]);
+        return !isNaN(date) && date <= new Date("2025-02-28T23:59:59");
+      });
+      const scorePlan = planFiltered.length > 0 ? (planDone.length / planFiltered.length) * 100 * 0.1 : 0;
+
+      // 유지관리기준
+      const dbSheet = dbWB[Object.keys(dbWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+      const dbFiltered = excludePrivate ? dbSheet.filter(r => !PRIVATE_OWNERS.includes(r["관리주체"]?.trim())) : dbSheet;
+
+      const sheet = noticeWB.Sheets[gov];
+      const groupKeys = new Set(), gradeKeys = new Set();
+
+      if (sheet) {
+        const groupCols = ["C", "D", "E", "F", "G"];
+        const gradeCols = ["H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"];
+        for (let i = 2; i < 200; i++) {
+          const infra = sheet[`A${i}`]?.v?.trim();
+          const fac = sheet[`B${i}`]?.v?.trim();
+          if (!infra || !fac) continue;
+
+          for (let col of groupCols) {
+            if (sheet[`${col}${i}`]?.v === "O") {
+              const label = sheet[`${col}1`]?.v?.trim();
+              groupKeys.add(`${infra}||${fac}||${label}`);
+            }
+          }
+          for (let col of gradeCols) {
+            if (sheet[`${col}${i}`]?.v === "O") {
+              const label = sheet[`${col}1`]?.v?.trim();
+              gradeKeys.add(`${infra}||${fac}||${label}`);
+            }
+          }
+        }
+      }
+
+      const included = dbFiltered.filter(r => groupKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["시설물종별"]}`));
+      const validGrades = included.filter(r => !GRADE_EXCLUDE.includes(r["등급"]?.trim()));
+      const passed = validGrades.filter(r => gradeKeys.has(`${r["기반시설구분"]}||${r["시설물종류"]}||${r["등급"]}`));
+      const scoreMaintain = validGrades.length > 0 ? (passed.length / validGrades.length) * 100 * 0.2 : 0;
+
+      // 조례제정
+      const ordinanceSheet = ordinanceWB[Object.keys(ordinanceWB)[0]].filter(r => r["관리계획 수립기관"]?.trim() === gov);
+      const ordinanceDone = ordinanceSheet.filter(r => r["충당금 조례 제정여부"]?.toString().trim() === "O");
+      const scoreOrdinance = ordinanceSheet.length > 0 ? (ordinanceDone.length / ordinanceSheet.length) * 100 * 0.2 : 0;
+
+      resultList.push({
+        지자체: gov,
+        실행계획: scorePlan.toFixed(2),
+        유지관리기준: scoreMaintain.toFixed(2),
+        조례제정: scoreOrdinance.toFixed(2),
+        총점: (scorePlan + scoreMaintain + scoreOrdinance).toFixed(2)
+      });
+    }
+
+    setAllResults(resultList);
+  } catch (err) {
+    alert("전체 점수 산출 중 오류가 발생했습니다.");
+    console.error(err);
+  } finally {
+    setIsBulkLoading(false);
+  }
+};
+
   return (
   <>
    {/* 🔐 관리자 기능: 로그인 성공 시 표시 */}
@@ -294,7 +380,7 @@ export default function FullAutomationApp() {
 
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <button
-            onClick={() => alert("🚧 전체 점수 일괄 산출 기능 준비 중")}
+            onClick={calculateAllGovScores}
             style={{
               padding: '12px 20px',
               backgroundColor: '#1976d2',
@@ -309,7 +395,7 @@ export default function FullAutomationApp() {
           </button>
 
           <button
-            onClick={() => alert("📥 전체 점수 현황 다운로드 기능 준비 중")}
+            onClick={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
             style={{
               padding: '12px 20px',
               backgroundColor: '#43a047',
@@ -347,6 +433,15 @@ export default function FullAutomationApp() {
         🔑 관리자 모드
       </button>
     </div>
+{/* ✅ 관리자 전용 점수 일괄 계산 UI */}
+    {isAdminMode && (
+      <AdminSummaryPanel
+        isLoading={isBulkLoading}
+        onRun={calculateAllGovScores}
+        onExport={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
+        allResults={allResults}
+      />
+    )}
 
   {/* ✅ 점수산정 전체 UI */}
   <div style={{ width: '100vw', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>

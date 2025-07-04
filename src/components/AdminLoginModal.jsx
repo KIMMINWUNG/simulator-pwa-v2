@@ -23,7 +23,7 @@ export default function AdminLoginModal({ onSuccess, onCancel }) {
       <div style={{
         backgroundColor: '#fff', padding: '32px', borderRadius: '12px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.2)', textAlign: 'center',
-        width: '340px'
+        width: '440px'
       }}>
         <h2 style={{ marginBottom: '12px' }}>🔐 관리자 로그인</h2>
         <p style={{ fontSize: '14px', marginBottom: '20px', color: '#555' }}>
