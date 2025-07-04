@@ -365,59 +365,6 @@ export default function FullAutomationApp() {
 
   return (
   <>
-   {/* 🔐 관리자 기능: 로그인 성공 시 표시 */}
-    {authorized && (
-      <div style={{
-        marginTop: '40px',
-        padding: '24px',
-        background: '#f9f9f9',
-        border: '2px dashed #1e88e5',
-        borderRadius: '12px',
-        width: '70vw',
-        maxWidth: '1400px',
-        marginLeft: 'auto',
-        marginRight: 'auto'
-      }}>
-        <h2 style={{ color: '#1e88e5', marginBottom: '16px' }}>🔧 관리자 전용 기능</h2>
-
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <button
-            onClick={calculateAllGovScores}
-            style={{
-              padding: '12px 20px',
-              backgroundColor: '#1976d2',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '15px',
-              cursor: 'pointer'
-            }}
-          >
-            전체 지자체 점수 일괄 산출
-          </button>
-
-          <button
-            onClick={() => exportExcel(allResults, "전체_지자체_점수_결과.xlsx")}
-            style={{
-              padding: '12px 20px',
-              backgroundColor: '#43a047',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '15px',
-              cursor: 'pointer'
-            }}
-          >
-            전체 점수 현황 다운로드
-          </button>
-        </div>
-
-        <p style={{ fontSize: '13px', color: '#888', marginTop: '12px' }}>
-          ※ 해당 기능은 관리자 인증 후에만 사용할 수 있습니다.
-        </p>
-      </div>
-    )}
-
     {/* ✅ 기존 UI 시작: 관리자 로그인 버튼 */}
     <div style={{ position: "absolute", top: 20, right: 20 }}>
       <button
