@@ -395,7 +395,7 @@ const handleDetailedExport = (type, filename) => {
   <button
     onClick={() => setShowAdminLogin(true)}
     style={{
-      padding: "8px 16px",
+      padding: "8px 10px",
       borderRadius: "6px",
       backgroundColor: "#6a1b9a", // 보라색 계열 강조
       color: "#fff",
